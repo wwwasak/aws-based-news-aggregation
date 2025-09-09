@@ -28,68 +28,75 @@ export class LambdaStack extends Stack {
 
     const { articlesTable, notificationsTable, notificationTopic, sourcesBucket } = props;
 
-    // 通用 Lambda 配置
+    // 通用 Lambda 配置（免费额度优化）
     const commonLambdaProps: Partial<NodejsFunctionProps> = {
       runtime: Runtime.NODEJS_18_X,
       architecture: Architecture.ARM_64,
-      timeout: Duration.minutes(5),
-      memorySize: 512,
+      timeout: Duration.seconds(90), // 降低超时时间以减少成本
+      memorySize: 256, // 降低内存以减少成本
       tracing: Tracing.ACTIVE,
       environment: {
         AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
         NODE_OPTIONS: '--enable-source-maps',
+        LOG_LEVEL: 'warn', // 减少日志输出以降低CloudWatch成本
       },
       bundling: {
         minify: true,
-        sourceMap: true,
+        sourceMap: false, // 禁用source map以减少包大小
         target: 'es2022',
         mainFields: ['module', 'main'],
       },
     };
 
-    // 新闻抓取函数
+    // 新闻抓取函数（免费额度优化）
     this.fetcherFunction = new NodejsFunction(this, 'FetcherFunction', {
       ...commonLambdaProps,
       functionName: 'news-agg-fetcher',
       description: 'Fetches and processes news articles from configured sources',
       entry: join(__dirname, '../../../apps/fetcher/src/index.ts'),
-      timeout: Duration.minutes(15),
-      memorySize: 1024,
+      timeout: Duration.minutes(3), // 降低超时时间
+      memorySize: 512, // 适中内存，平衡性能和成本
       environment: {
         ...commonLambdaProps.environment,
         ARTICLES_TABLE_NAME: articlesTable.tableName,
         SOURCES_BUCKET: sourcesBucket?.bucketName || '',
         SOURCES_PATH: 'configs/sources.yaml',
+        DEDUP_WINDOW_HOURS: '12', // 减少去重窗口以降低DynamoDB读取
+        MAX_CONCURRENT_FETCHES: '3', // 降低并发数
+        RETRY_MAX_ATTEMPTS: '2', // 减少重试次数
       },
     });
 
-    // API 函数
+    // API 函数（免费额度优化）
     this.apiFunction = new NodejsFunction(this, 'ApiFunction', {
       ...commonLambdaProps,
       functionName: 'news-agg-api',
       description: 'REST API for news articles access',
       entry: join(__dirname, '../../../apps/api/src/index.ts'),
-      timeout: Duration.seconds(30),
+      timeout: Duration.seconds(25), // 略微降低超时时间
+      memorySize: 128, // 最小内存，API通常不需要太多内存
       environment: {
         ...commonLambdaProps.environment,
         ARTICLES_TABLE_NAME: articlesTable.tableName,
       },
     });
 
-    // 通知函数
+    // 通知函数（免费额度优化）
     this.notifierFunction = new NodejsFunction(this, 'NotifierFunction', {
       ...commonLambdaProps,
       functionName: 'news-agg-notifier',
       description: 'Sends notifications for high-score articles via SNS',
       entry: join(__dirname, '../../../apps/notifier/src/index.ts'),
-      timeout: Duration.minutes(2),
+      timeout: Duration.seconds(90), // 降低超时时间
+      memorySize: 128, // 最小内存，通知处理不需要太多内存
       environment: {
         ...commonLambdaProps.environment,
         SNS_TOPIC_ARN: notificationTopic.topicArn,
         ARTICLES_TABLE_NAME: articlesTable.tableName,
         NOTIFICATIONS_TABLE_NAME: notificationsTable.tableName,
-        BIG_TECH_MIN_SCORE: '70',
-        DEDUP_WINDOW_HOURS: '24',
+        BIG_TECH_MIN_SCORE: '80', // 提高阈值以减少通知频率
+        DEDUP_WINDOW_HOURS: '12', // 减少去重窗口
+        MAX_NOTIFICATIONS_PER_HOUR: '5', // 限制每小时通知数量
       },
     });
 

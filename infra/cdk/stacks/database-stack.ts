@@ -35,6 +35,9 @@ export class DatabaseStack extends Stack {
       // 开启 DynamoDB Streams (NEW_AND_OLD_IMAGES) - 用于 Notifier
       stream: StreamViewType.NEW_AND_OLD_IMAGES,
       
+      // TTL 自动清理 - 7天后自动删除文章（成本优化）
+      timeToLiveAttribute: 'ttl',
+      
       // 启用时间点恢复
       pointInTimeRecovery: true,
       

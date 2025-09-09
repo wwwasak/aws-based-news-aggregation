@@ -16,11 +16,11 @@ export class SchedulerStack extends Stack {
 
     const { fetcherFunction } = props;
 
-    // 创建定时调度规则 - 每 10 分钟触发一次
+    // 创建定时调度规则 - 每 30 分钟触发一次（免费额度优化）
     this.fetcherScheduleRule = new Rule(this, 'FetcherScheduleRule', {
       ruleName: 'news-agg-fetcher-schedule',
-      description: 'Triggers news fetcher Lambda function every 10 minutes',
-      schedule: Schedule.rate(Duration.minutes(10)),
+      description: 'Triggers news fetcher Lambda function every 30 minutes (cost optimized)',
+      schedule: Schedule.rate(Duration.minutes(30)),
       enabled: true,
     });
 

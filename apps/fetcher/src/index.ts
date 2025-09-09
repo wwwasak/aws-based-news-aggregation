@@ -283,6 +283,10 @@ async function processCandidate(
   
   // 5. 构建文章对象
   const epoch = Math.floor(new Date(candidate.publishedAt).getTime() / 1000);
+  const currentTime = Math.floor(Date.now() / 1000);
+  const sevenDaysInSeconds = 7 * 24 * 60 * 60; // 7天的秒数
+  const ttlTimestamp = currentTime + sevenDaysInSeconds; // TTL设置为7天后
+  
   const article = {
     // 主键设计
     pk: `source#${candidate.domain}`,
@@ -308,6 +312,9 @@ async function processCandidate(
     score: matchResult.score,
     isBigTech: matchResult.score >= 50, // 阈值可配置
     isPolicy: Array.from(matchResult.tags).some(tag => tag.includes('policy')),
+    
+    // TTL 自动清理 - 7天后自动删除（成本优化）
+    ttl: ttlTimestamp,
     
     // 元数据
     createdAt: getCurrentTimestamp(),
