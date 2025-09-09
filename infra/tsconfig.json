@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./cdk",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "target": "ES2020",
+    "lib": ["ES2020"]
+  },
+  "include": ["cdk/**/*"],
+  "exclude": ["dist", "node_modules", "cdk.out", "**/*.test.ts"]
+}

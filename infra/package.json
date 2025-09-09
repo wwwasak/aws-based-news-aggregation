@@ -1,0 +1,26 @@
+{
+  "name": "@news-agg/infra",
+  "version": "1.0.0",
+  "description": "CDK infrastructure for news aggregation",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "vitest",
+    "clean": "rimraf dist cdk.out",
+    "cdk": "cdk",
+    "deploy": "pnpm run build && cdk deploy --all --require-approval never",
+    "destroy": "cdk destroy --all --force",
+    "synth": "pnpm run build && cdk synth",
+    "diff": "pnpm run build && cdk diff",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.110.0",
+    "constructs": "^10.3.0"
+  },
+  "devDependencies": {
+    "vitest": "^1.0.0",
+    "aws-cdk": "^2.110.0"
+  }
+}

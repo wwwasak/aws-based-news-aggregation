@@ -1,0 +1,187 @@
+# 新闻源配置
+# 支持 RSS 订阅和网页抓取两种类型
+
+# 全局配置
+config:
+  # 全局请求超时 (毫秒)
+  requestTimeout: 30000
+  # 用户代理字符串
+  userAgent: "NewsAggregator/1.0 (+https://github.com/news-aggregator)"
+  # 最大并发数
+  maxConcurrency: 5
+  # 默认重试次数
+  defaultRetries: 3
+  # 默认权重
+  defaultWeight: 1
+  # 默认抓取间隔 (秒)
+  defaultInterval: 3600
+
+# 新闻源列表
+sources:
+  # 高优先级 RSS 源
+  - name: TechCrunch
+    type: rss
+    url: https://techcrunch.com/feed/
+    weight: 2
+    intervalSec: 600  # 10分钟
+    enabled: true
+    description: "Leading technology media property"
+    tags: ["tech", "startup", "venture-capital"]
+    rateLimit:
+      requestsPerMinute: 10
+      burstSize: 5
+
+  - name: Wired
+    type: rss
+    url: https://www.wired.com/feed/rss
+    weight: 2
+    intervalSec: 600  # 10分钟
+    enabled: true
+    description: "Technology, science, culture, and business news"
+    tags: ["tech", "science", "culture"]
+    rateLimit:
+      requestsPerMinute: 10
+      burstSize: 5
+
+  # 中等优先级 RSS 源
+  - name: VentureBeat
+    type: rss
+    url: https://venturebeat.com/feed/
+    weight: 1
+    intervalSec: 900  # 15分钟
+    enabled: true
+    description: "Technology news and analysis"
+    tags: ["tech", "business", "ai"]
+    rateLimit:
+      requestsPerMinute: 8
+      burstSize: 3
+
+  - name: Engadget
+    type: rss
+    url: https://www.engadget.com/rss.xml
+    weight: 1
+    intervalSec: 900  # 15分钟
+    enabled: true
+    description: "Consumer technology news and reviews"
+    tags: ["tech", "gadgets", "reviews"]
+    rateLimit:
+      requestsPerMinute: 8
+      burstSize: 3
+
+  - name: Gizmodo
+    type: rss
+    url: https://gizmodo.com/rss
+    weight: 1
+    intervalSec: 900  # 15分钟
+    enabled: true
+    description: "Design, technology, and science news"
+    tags: ["tech", "science", "design"]
+    rateLimit:
+      requestsPerMinute: 8
+      burstSize: 3
+
+  # 特殊页面抓取源 (高频率)
+  - name: Techmeme
+    type: page
+    url: https://www.techmeme.com/
+    weight: 3
+    intervalSec: 300  # 5分钟
+    enabled: true
+    description: "Technology news aggregation and curation"
+    tags: ["tech", "aggregation", "breaking"]
+    rateLimit:
+      requestsPerMinute: 12
+      burstSize: 6
+    pageConfig:
+      # Techmeme 特定的抓取配置
+      selectors:
+        title: ".ourh"
+        link: ".ourh a"
+        summary: ".excerpt"
+        timestamp: ".timestamp"
+      followLinks: false
+      maxItems: 50
+
+  # 备用和实验性源 (可选启用)
+  - name: Ars Technica
+    type: rss
+    url: https://feeds.arstechnica.com/arstechnica/index
+    weight: 2
+    intervalSec: 1200  # 20分钟
+    enabled: false  # 默认禁用，可按需启用
+    description: "In-depth technology news and analysis"
+    tags: ["tech", "analysis", "deep-dive"]
+    rateLimit:
+      requestsPerMinute: 6
+      burstSize: 3
+
+  - name: The Verge
+    type: rss
+    url: https://www.theverge.com/rss/index.xml
+    weight: 2
+    intervalSec: 1200  # 20分钟
+    enabled: false  # 默认禁用
+    description: "Technology, science, art, and culture"
+    tags: ["tech", "culture", "reviews"]
+    rateLimit:
+      requestsPerMinute: 8
+      burstSize: 4
+
+  # 国际科技新闻源
+  - name: BBC Technology
+    type: rss
+    url: http://feeds.bbci.co.uk/news/technology/rss.xml
+    weight: 1
+    intervalSec: 1800  # 30分钟
+    enabled: false
+    description: "BBC Technology news section"
+    tags: ["tech", "international", "bbc"]
+    rateLimit:
+      requestsPerMinute: 5
+      burstSize: 2
+
+  - name: Reuters Technology
+    type: rss
+    url: https://www.reuters.com/technology/feed/
+    weight: 2
+    intervalSec: 1800  # 30分钟
+    enabled: false
+    description: "Reuters Technology news"
+    tags: ["tech", "business", "international"]
+    rateLimit:
+      requestsPerMinute: 6
+      burstSize: 3
+
+# 错峰调度配置
+scheduling:
+  # 启动时的随机延迟范围 (秒)
+  initialDelayRange: [0, 300]
+  # 错峰调度窗口 (秒) - 在间隔时间基础上的随机偏移
+  jitterRange: [-60, 60]
+  # 失败重试的退避策略
+  backoffStrategy:
+    type: "exponential"  # exponential | linear | fixed
+    baseDelay: 30        # 基础延迟 (秒)
+    maxDelay: 3600       # 最大延迟 (秒)
+    multiplier: 2        # 指数退避倍数
+    maxRetries: 5        # 最大重试次数
+
+# 监控和日志配置
+monitoring:
+  # 是否启用详细日志
+  verboseLogging: true
+  # 性能指标收集
+  collectMetrics: true
+  # 错误率阈值 (超过此比例将触发告警)
+  errorRateThreshold: 0.1
+  # 慢请求阈值 (毫秒)
+  slowRequestThreshold: 10000
+
+# 健康检查配置
+healthCheck:
+  # 健康检查间隔 (秒)
+  interval: 300
+  # 连续失败多少次后标记为不健康
+  failureThreshold: 3
+  # 不健康源的恢复检查间隔 (秒)
+  recoveryInterval: 1800

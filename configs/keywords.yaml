@@ -1,0 +1,181 @@
+# 新闻关键词过滤配置
+# 用于评分和标签分类
+
+# 公司列表 - 用于 $company 占位符展开
+companies:
+  - Apple
+  - Microsoft
+  - Google
+  - Alphabet
+  - Amazon
+  - AWS
+  - Meta
+  - Facebook
+  - Nvidia
+  - OpenAI
+  - Tesla
+  - Netflix
+  - Uber
+  - Airbnb
+  - Spotify
+  - Twitter
+  - X
+
+# 主题关键词列表 - 用于 $topic 占位符展开
+topics:
+  - AI
+  - LLM
+  - model
+  - policy
+  - regulation
+  - antitrust
+  - DOJ
+  - FTC
+  - "export controls"
+  - cloud
+  - datacenter
+  - layoffs
+  - GPU
+  - TPU
+  - inference
+  - training
+  - Copilot
+  - "Apple Intelligence"
+  - ChatGPT
+  - GPT
+  - "machine learning"
+  - "artificial intelligence"
+  - blockchain
+  - cryptocurrency
+  - bitcoin
+  - ethereum
+
+# 规则定义
+rules:
+  # 大科技公司 + AI/政策相关 (高权重)
+  - name: bigtech_ai_policy
+    description: "大科技公司的AI和政策相关新闻"
+    any:
+      - "$company\\b.*(AI|LLM|model|policy|regulation|antitrust|FTC|DOJ|investigation|lawsuit|monopoly)"
+      - "(AI|LLM|model|policy|regulation|antitrust|FTC|DOJ|investigation|lawsuit|monopoly).*$company\\b"
+    addTags: [bigtech, ai, policy]
+    weight: 5
+
+  # 云基础设施相关
+  - name: cloud_infrastructure
+    description: "云计算和基础设施相关新闻"
+    any:
+      - "$company\\b.*(cloud|datacenter|GPU|TPU|inference|training|server|compute)"
+      - "(cloud|datacenter|GPU|TPU|inference|training|server|compute).*$company\\b"
+    addTags: [bigtech, cloud, infrastructure]
+    weight: 3
+
+  # AI 技术突破
+  - name: ai_breakthrough
+    description: "AI技术突破和产品发布"
+    any:
+      - "\\b(breakthrough|launch|release|announce)\\b.*(AI|LLM|model|ChatGPT|GPT|Copilot)"
+      - "\\b(AI|LLM|model|ChatGPT|GPT|Copilot).*(breakthrough|launch|release|announce)\\b"
+    addTags: [ai, technology, breakthrough]
+    weight: 4
+
+  # 公司收购和投资
+  - name: acquisition_investment
+    description: "收购、投资和合并相关新闻"
+    any:
+      - "$company\\b.*(acquisition|acquire|merger|invest|funding|IPO|valuation)"
+      - "(acquisition|acquire|merger|invest|funding|IPO|valuation).*$company\\b"
+    addTags: [bigtech, business, finance]
+    weight: 4
+
+  # 人事变动 (高管、裁员)
+  - name: personnel_changes
+    description: "高管变动和人事调整"
+    any:
+      - "$company\\b.*(CEO|CTO|CFO|layoffs|hire|fire|resign|appointment)"
+      - "(CEO|CTO|CFO|layoffs|hire|fire|resign|appointment).*$company\\b"
+    addTags: [bigtech, personnel, leadership]
+    weight: 3
+
+  # 监管和法律问题
+  - name: regulatory_legal
+    description: "监管和法律相关问题"
+    any:
+      - "\\b(regulation|regulatory|legal|lawsuit|court|judge|fine|penalty|compliance)\\b"
+      - "\\b(privacy|data protection|GDPR|CCPA|security breach|hack)\\b"
+    addTags: [policy, legal, regulation]
+    weight: 4
+
+  # 财报和业绩
+  - name: earnings_performance
+    description: "财报、业绩和市场表现"
+    any:
+      - "$company\\b.*(earnings|revenue|profit|loss|stock|share|market cap|quarterly)"
+      - "(earnings|revenue|profit|loss|stock|share|market cap|quarterly).*$company\\b"
+    addTags: [bigtech, finance, earnings]
+    weight: 2
+
+  # 产品发布和更新
+  - name: product_launch
+    description: "新产品发布和重大更新"
+    any:
+      - "$company\\b.*(launch|release|unveil|announce|debut|update|version)"
+      - "\\b(iPhone|iPad|MacBook|Surface|Pixel|Galaxy|Windows|iOS|Android)\\b"
+    addTags: [bigtech, product, launch]
+    weight: 2
+
+  # 突发新闻标识符
+  - name: breaking_news
+    description: "突发新闻标识符"
+    any:
+      - "^\\s*(BREAKING|URGENT|ALERT|JUST IN|DEVELOPING)"
+      - "\\b(breaking|urgent|alert|developing|just in)\\b"
+    addTags: [breaking, urgent]
+    weight: 6
+
+  # 数据泄露和安全事件
+  - name: security_incidents
+    description: "安全事件和数据泄露"
+    any:
+      - "\\b(data breach|hack|cyber attack|security incident|leak|vulnerability)\\b"
+      - "$company\\b.*(breach|hack|attack|leak|vulnerability|security)"
+    addTags: [security, incident, urgent]
+    weight: 5
+
+# 评分阈值配置
+scoreThresholds:
+  # 大科技公司相关文章的最低分数
+  bigtech: 4
+  # 政策相关文章的最低分数  
+  policy: 3
+  # AI 相关文章的最低分数
+  ai: 3
+  # 突发新闻的最低分数
+  breaking: 5
+  # 安全事件的最低分数
+  security: 4
+
+# 黑名单关键词 (降低分数或排除)
+blacklist:
+  - advertisement
+  - sponsored
+  - "ad content"
+  - promotional
+  - marketing
+  - "press release"
+  - rumors
+  - speculation
+  - unconfirmed
+
+# 全局配置
+config:
+  # 最低文章分数 (低于此分数的文章会被过滤)
+  minScore: 1
+  # 最高文章分数 (分数上限)
+  maxScore: 100
+  # 是否启用大小写敏感匹配
+  caseSensitive: false
+  # 是否启用词边界匹配
+  wordBoundary: true
+  # 默认权重 (未匹配任何规则时)
+  defaultWeight: 1

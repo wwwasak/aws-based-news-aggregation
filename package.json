@@ -1,0 +1,39 @@
+{
+  "name": "news-agg",
+  "version": "1.0.0",
+  "description": "AWS Serverless News Aggregation System",
+  "type": "module",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "infra"
+  ],
+  "scripts": {
+    "build": "pnpm run -r build",
+    "test": "pnpm run -r test",
+    "lint": "eslint . --ext .ts,.tsx --fix",
+    "deploy": "cd infra && pnpm run deploy",
+    "dev:fetcher": "cd apps/fetcher && pnpm run dev",
+    "dev:scheduler": "cd apps/fetcher && pnpm run dev:scheduler",
+    "dev:api": "cd apps/api && pnpm run dev",
+    "clean": "pnpm run -r clean && rimraf dist node_modules/.cache",
+    "typecheck": "pnpm run -r typecheck",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "eslint": "^8.54.0",
+    "prettier": "^3.1.0",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.12.0"
+}
