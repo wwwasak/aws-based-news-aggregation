@@ -45,6 +45,7 @@ export class LambdaStack extends Stack {
         sourceMap: false, // 禁用source map以减少包大小
         target: 'es2022',
         mainFields: ['module', 'main'],
+        externalModules: ['@aws-sdk/*', 'aws-lambda', 'fs', 'path'],
       },
     };
 

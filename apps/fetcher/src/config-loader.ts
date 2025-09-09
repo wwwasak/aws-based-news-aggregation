@@ -17,6 +17,12 @@ export class ConfigLoader {
    */
   loadSources(): SourcesConfig {
     try {
+      // 在Lambda环境中，直接使用默认配置避免文件系统访问问题
+      if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
+        console.log('🔧 Using default configuration in Lambda environment');
+        return this.getDefaultSourcesConfig();
+      }
+      
       const sourcesPath = join(this.configPath, 'sources.yaml');
       const content = readFileSync(sourcesPath, 'utf8');
       const config = yaml.load(content) as SourcesConfig;
@@ -36,6 +42,12 @@ export class ConfigLoader {
    */
   loadKeywords(): KeywordConfig {
     try {
+      // 在Lambda环境中，直接使用默认配置避免文件系统访问问题
+      if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
+        console.log('🔧 Using default keyword configuration in Lambda environment');
+        return this.getDefaultKeywordConfig();
+      }
+      
       const keywordsPath = join(this.configPath, 'keywords.yaml');
       const content = readFileSync(keywordsPath, 'utf8');
       const config = yaml.load(content) as KeywordConfig;

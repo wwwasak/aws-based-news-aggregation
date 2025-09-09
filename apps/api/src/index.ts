@@ -8,17 +8,23 @@ import { ErrorCode } from './types.js';
 export const handler: APIGatewayProxyHandler = async (event, context) => {
   const startTime = Date.now();
   
+  // 兼容API Gateway v1和v2事件格式
+  const path = event.path || (event as any).rawPath || '/';
+  const method = event.httpMethod || (event as any).requestContext?.http?.method || 'GET';
+  const headers = event.headers || {};
+  const queryParams = event.queryStringParameters || (event as any).queryStringParameters || {};
+  
   console.log('API request received', {
     requestId: context.awsRequestId,
-    path: event.path,
-    method: event.httpMethod,
-    userAgent: event.headers['User-Agent'],
-    sourceIp: event.requestContext?.identity?.sourceIp,
+    path: path,
+    method: method,
+    userAgent: headers['User-Agent'] || headers['user-agent'],
+    sourceIp: event.requestContext?.identity?.sourceIp || (event as any).requestContext?.http?.sourceIp,
   });
 
   try {
     // 处理 CORS 预检请求
-    if (event.httpMethod === 'OPTIONS') {
+    if (method === 'OPTIONS') {
       return {
         statusCode: 200,
         headers: {
@@ -32,18 +38,26 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     }
 
     // 只允许 GET 请求
-    if (event.httpMethod !== 'GET') {
-      console.warn('Method not allowed', { method: event.httpMethod });
+    if (method !== 'GET') {
+      console.warn('Method not allowed', { method: method });
       return createErrorResponse(405, ErrorCode.VALIDATION_ERROR, 'Method not allowed');
     }
 
     // 路由处理
-    const path = event.path;
     const pathSegments = path.split('/').filter(segment => segment.length > 0);
+
+    // 创建适配的事件对象
+    const adaptedEvent = {
+      ...event,
+      path: path,
+      httpMethod: method,
+      headers: headers,
+      queryStringParameters: queryParams,
+    };
 
     // 健康检查路由
     if (path === '/health' || path === '/v1/health') {
-      return await handleHealth(event);
+      return await handleHealth(adaptedEvent);
     }
 
     // API v1 路由
@@ -54,7 +68,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
         const feedType = pathSegments[2];
         
         if (feedType === 'bigtech') {
-          return await handleBigTech(event);
+          return await handleBigTech(adaptedEvent);
         } else {
           console.warn('Unknown feed type', { feedType });
           return createErrorResponse(404, ErrorCode.NOT_FOUND, `Feed type '${feedType}' not found`);
@@ -62,7 +76,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
       }
       
       if (resource === 'search') {
-        return await handleSearch(event);
+        return await handleSearch(adaptedEvent);
       }
       
       console.warn('Unknown API resource', { resource });

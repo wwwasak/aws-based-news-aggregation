@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: ['src/index.ts'],
+  entry: ['src/simple-test.ts'],
   format: ['esm'],
   dts: false,
   clean: true,
@@ -9,7 +9,7 @@ export default defineConfig({
   minify: true,
   target: 'node18',
   bundle: true,
-  external: ['@aws-sdk/*', 'aws-lambda'],
+  external: ['@aws-sdk/*', 'aws-lambda', 'fs', 'path', 'os', 'util', 'crypto'],
   banner: {
     js: 'import { createRequire } from "module"; const require = createRequire(import.meta.url);',
   },

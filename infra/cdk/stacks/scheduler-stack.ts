@@ -42,6 +42,10 @@ export class SchedulerStack extends Stack {
       ruleName: 'news-agg-fetcher-manual',
       description: 'Manual trigger rule for news fetcher (testing/debugging)',
       enabled: false, // 默认禁用，需要手动启用
+      eventPattern: {
+        source: ['news-agg.manual'],
+        detailType: ['Manual Trigger'],
+      },
     });
 
     // 手动触发目标
