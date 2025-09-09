@@ -1,12 +1,23 @@
 {
-  "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./cdk",
+    "target": "ES2020",
     "module": "CommonJS",
     "moduleResolution": "node",
-    "target": "ES2020",
-    "lib": ["ES2020"]
+    "lib": ["ES2020"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": "./cdk",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "isolatedModules": false,
+    "verbatimModuleSyntax": false
   },
   "include": ["cdk/**/*"],
   "exclude": ["dist", "node_modules", "cdk.out", "**/*.test.ts"]

@@ -2,7 +2,6 @@
   "name": "@news-agg/infra",
   "version": "1.0.0",
   "description": "CDK infrastructure for news aggregation",
-  "type": "module",
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",

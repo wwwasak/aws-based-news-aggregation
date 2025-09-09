@@ -1,6 +1,6 @@
 import { Construct } from 'constructs';
 import { Stack, StackProps, Duration } from 'aws-cdk-lib';
-import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
+import { Rule, Schedule, RuleTargetInput } from 'aws-cdk-lib/aws-events';
 import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 
@@ -27,14 +27,13 @@ export class SchedulerStack extends Stack {
     // 添加 Lambda 目标
     this.fetcherScheduleRule.addTarget(
       new LambdaFunction(fetcherFunction, {
-        event: {
-          source: 'eventbridge.scheduler',
+        event: RuleTargetInput.fromObject({
           'detail-type': 'Scheduled Event',
           detail: {
             scheduledTime: new Date().toISOString(),
             triggerSource: 'eventbridge-scheduler',
           },
-        },
+        }),
       })
     );
 
@@ -48,14 +47,13 @@ export class SchedulerStack extends Stack {
     // 手动触发目标
     manualTriggerRule.addTarget(
       new LambdaFunction(fetcherFunction, {
-        event: {
-          source: 'manual.trigger',
+        event: RuleTargetInput.fromObject({
           'detail-type': 'Manual Trigger',
           detail: {
             triggerSource: 'manual',
             forceRefresh: true,
           },
-        },
+        }),
       })
     );
   }

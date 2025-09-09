@@ -1,5 +1,5 @@
 import { Construct } from 'constructs';
-import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib';
+import { Stack, StackProps, CfnOutput, Duration } from 'aws-cdk-lib';
 import { HttpApi, HttpMethod, CorsHttpMethod } from 'aws-cdk-lib/aws-apigatewayv2';
 import { HttpLambdaIntegration } from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
@@ -34,7 +34,7 @@ export class ApiStack extends Stack {
           'X-Requested-With',
           'Accept',
         ],
-        maxAge: 300,
+        maxAge: Duration.seconds(300),
       },
     });
 

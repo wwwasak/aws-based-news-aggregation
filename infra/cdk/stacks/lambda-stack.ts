@@ -6,6 +6,7 @@ import { Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Topic } from 'aws-cdk-lib/aws-sns';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { DynamoEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
+import { StartingPosition } from 'aws-cdk-lib/aws-lambda';
 import { PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam';
 import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { join } from 'path';
@@ -42,9 +43,7 @@ export class LambdaStack extends Stack {
         minify: true,
         sourceMap: true,
         target: 'es2022',
-        format: 'esm',
         mainFields: ['module', 'main'],
-        banner: 'import { createRequire } from "module"; const require = createRequire(import.meta.url);',
       },
     };
 
@@ -97,7 +96,7 @@ export class LambdaStack extends Stack {
     // 配置 DynamoDB Stream 触发器
     this.notifierFunction.addEventSource(
       new DynamoEventSource(articlesTable, {
-        startingPosition: 'LATEST',
+        startingPosition: StartingPosition.LATEST,
         batchSize: 10,
         maxBatchingWindow: Duration.seconds(5),
         retryAttempts: 3,

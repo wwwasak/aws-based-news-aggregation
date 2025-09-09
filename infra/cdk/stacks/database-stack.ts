@@ -40,36 +40,35 @@ export class DatabaseStack extends Stack {
       
       // 删除策略 (生产环境应使用 RETAIN)
       removalPolicy: RemovalPolicy.DESTROY,
-      
-      // 全局二级索引
-      globalSecondaryIndexes: [
-        // GSI1: 按标签查询
-        {
-          indexName: 'GSI1',
-          partitionKey: {
-            name: 'GSI1PK',
-            type: AttributeType.STRING,
-          },
-          sortKey: {
-            name: 'GSI1SK',
-            type: AttributeType.STRING,
-          },
-          projectionType: ProjectionType.ALL,
-        },
-        // GSI2: 按来源查询
-        {
-          indexName: 'GSI2',
-          partitionKey: {
-            name: 'GSI2PK',
-            type: AttributeType.STRING,
-          },
-          sortKey: {
-            name: 'GSI2SK',
-            type: AttributeType.STRING,
-          },
-          projectionType: ProjectionType.ALL,
-        },
-      ],
+    });
+
+    // 添加全局二级索引
+    // GSI1: 按标签查询
+    this.articlesTable.addGlobalSecondaryIndex({
+      indexName: 'GSI1',
+      partitionKey: {
+        name: 'GSI1PK',
+        type: AttributeType.STRING,
+      },
+      sortKey: {
+        name: 'GSI1SK',
+        type: AttributeType.STRING,
+      },
+      projectionType: ProjectionType.ALL,
+    });
+
+    // GSI2: 按来源查询
+    this.articlesTable.addGlobalSecondaryIndex({
+      indexName: 'GSI2',
+      partitionKey: {
+        name: 'GSI2PK',
+        type: AttributeType.STRING,
+      },
+      sortKey: {
+        name: 'GSI2SK',
+        type: AttributeType.STRING,
+      },
+      projectionType: ProjectionType.ALL,
     });
 
     // 输出表名
@@ -115,23 +114,21 @@ export class DatabaseStack extends Stack {
       
       // 删除策略 (生产环境应使用 RETAIN)
       removalPolicy: RemovalPolicy.DESTROY,
-      
-      // 全局二级索引
-      globalSecondaryIndexes: [
-        // GSI1: 按状态查询通知历史
-        {
-          indexName: 'GSI1',
-          partitionKey: {
-            name: 'GSI1PK',
-            type: AttributeType.STRING,
-          },
-          sortKey: {
-            name: 'GSI1SK',
-            type: AttributeType.STRING,
-          },
-          projectionType: ProjectionType.ALL,
-        },
-      ],
+    });
+
+    // 添加全局二级索引
+    // GSI1: 按状态查询通知历史
+    this.notificationsTable.addGlobalSecondaryIndex({
+      indexName: 'GSI1',
+      partitionKey: {
+        name: 'GSI1PK',
+        type: AttributeType.STRING,
+      },
+      sortKey: {
+        name: 'GSI1SK',
+        type: AttributeType.STRING,
+      },
+      projectionType: ProjectionType.ALL,
     });
 
     // 输出通知表名

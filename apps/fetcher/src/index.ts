@@ -140,15 +140,14 @@ export const handler: Handler<EventBridgeEvent<'Scheduled Event', FetcherEvent>>
       sourcesProcessed: sourcesToProcess.length,
     }));
     
+    const successRate = (stats.successCount / Math.max(stats.totalProcessed, 1)) * 100;
+    
     const result = {
       success: true,
       stats,
       duration,
       sourcesProcessed: sourcesToProcess.length,
     };
-    
-    const duration = Date.now() - startTime;
-    const successRate = (stats.successCount / Math.max(stats.totalProcessed, 1)) * 100;
     
     // 记录详细的执行统计
     logger.info('Fetch process completed successfully', {

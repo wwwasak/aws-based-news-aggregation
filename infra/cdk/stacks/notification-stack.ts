@@ -17,7 +17,6 @@ export class NotificationStack extends Stack {
     this.notificationTopic = new Topic(this, 'NotificationTopic', {
       topicName: 'news-agg-notifications',
       displayName: 'News Aggregation Notifications',
-      description: 'SNS topic for news notifications - placeholder for future APNs/FCM integration',
     });
 
     // 如果提供了邮箱地址，添加邮件订阅（用于测试）

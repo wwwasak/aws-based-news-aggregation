@@ -9,7 +9,7 @@ export default defineConfig({
   minify: true,
   target: 'node18',
   bundle: true,
-  external: ['@aws-sdk/*'],
+  external: ['@aws-sdk/*', 'aws-lambda'],
   banner: {
     js: 'import { createRequire } from "module"; const require = createRequire(import.meta.url);',
   },
