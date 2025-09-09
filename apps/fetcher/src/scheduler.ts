@@ -2,8 +2,8 @@
  * 新闻抓取调度器 - 支持错峰调度和令牌桶限速
  */
 
-import { RateLimiter, ExponentialBackoff, StaggeredScheduler } from './rate-limiter.js';
-import { NewsSource, SourcesConfig, FetchResult } from './types.js';
+import { RateLimiter, ExponentialBackoff, StaggeredScheduler } from './rate-limiter';
+import { NewsSource, SourcesConfig, FetchResult } from './types';
 
 export interface SchedulerOptions {
   maxConcurrency?: number;

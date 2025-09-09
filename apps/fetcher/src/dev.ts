@@ -4,10 +4,15 @@
  * 本地调试入口脚本 - 单次执行新闻抓取并打印统计
  */
 
-import { handler } from './index.js';
+import { handler } from './index';
 
 async function runLocalFetch() {
   console.log('🔧 Starting local news fetcher development run...\n');
+  console.log('📍 Current working directory:', process.cwd());
+  console.log('📍 Node.js version:', process.version);
+  console.log('📍 Environment:', process.env.NODE_ENV || 'not set');
+  console.log('📍 Script started at:', new Date().toISOString());
+  console.log('');
   
   // 模拟 EventBridge 事件
   const mockEvent = {
@@ -44,10 +49,14 @@ async function runLocalFetch() {
 
   try {
     console.log('📡 Invoking fetcher handler...\n');
+    console.log('🔧 Mock event:', JSON.stringify(mockEvent, null, 2));
+    console.log('');
     
     const startTime = Date.now();
+    console.log('⏰ Handler execution started at:', new Date().toISOString());
     const result = await handler(mockEvent, mockContext, () => {});
     const duration = Date.now() - startTime;
+    console.log('⏰ Handler execution completed at:', new Date().toISOString());
     
     console.log('\n🎉 Development fetch completed successfully!');
     console.log('📊 Results Summary:');
@@ -113,7 +122,7 @@ process.on('SIGTERM', () => {
 });
 
 // 如果直接运行此脚本
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (import.meta.url.endsWith(process.argv[1].replace(/\\/g, '/'))) {
   runLocalFetch().catch(error => {
     console.error('💥 Fatal error in development script:', error);
     process.exit(1);

@@ -2,13 +2,14 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import * as yaml from 'js-yaml';
 import { type KeywordConfig } from '@news-agg/shared';
-import { NewsSourceConfig, NewsSource, SourcesConfig } from './types.js';
+import { NewsSourceConfig, NewsSource, SourcesConfig } from './types';
 
 export class ConfigLoader {
   private configPath: string;
 
   constructor(configPath?: string) {
-    this.configPath = configPath || join(process.cwd(), 'configs');
+    // 在开发环境中，配置文件位于项目根目录的 configs 文件夹
+    this.configPath = configPath || join(process.cwd(), '../../configs');
   }
 
   /**

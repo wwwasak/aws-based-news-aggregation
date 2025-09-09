@@ -1,6 +1,6 @@
 import RSSParser from 'rss-parser';
 import { extractDomain, parseDate, isValidUrl } from '@news-agg/shared';
-import { NewsCandidate } from '../types.js';
+import { NewsCandidate } from '../types';
 
 interface RSSItem {
   title?: string;

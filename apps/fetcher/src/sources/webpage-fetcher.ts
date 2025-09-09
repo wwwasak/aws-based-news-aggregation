@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { extractDomain, isValidUrl, getCurrentTimestamp } from '@news-agg/shared';
-import { NewsCandidate } from '../types.js';
+import { NewsCandidate } from '../types';
 
 export class WebpageFetcher {
   /**

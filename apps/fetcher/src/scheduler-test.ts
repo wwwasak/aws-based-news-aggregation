@@ -4,8 +4,8 @@
  * 调度器测试脚本 - 验证错峰调度和令牌桶限速
  */
 
-import { FetchScheduler } from './scheduler.js';
-import { ConfigLoader } from './config-loader.js';
+import { FetchScheduler } from './scheduler';
+import { ConfigLoader } from './config-loader';
 
 async function testScheduler() {
   console.log('🧪 Testing Fetch Scheduler with Rate Limiting and Staggering...\n');

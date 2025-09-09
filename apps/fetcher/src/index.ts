@@ -2,12 +2,12 @@ import type { Handler, EventBridgeEvent } from 'aws-lambda';
 import { NewsStore } from '@news-agg/store';
 import { KeywordEngine } from '@news-agg/keyword-engine';
 import { normalizeUrl, normalizeTitle, hash, getCurrentTimestamp, createLambdaLogger } from '@news-agg/shared';
-import { ConfigLoader } from './config-loader.js';
-import { RSSFetcher } from './sources/rss-fetcher.js';
-import { WebpageFetcher } from './sources/webpage-fetcher.js';
-import { Deduplicator } from './deduplicator.js';
-import { RateLimiter } from './rate-limiter.js';
-import { FetchStats, NewsCandidate } from './types.js';
+import { ConfigLoader } from './config-loader';
+import { RSSFetcher } from './sources/rss-fetcher';
+import { WebpageFetcher } from './sources/webpage-fetcher';
+import { Deduplicator } from './deduplicator';
+import { RateLimiter } from './rate-limiter';
+import { FetchStats, NewsCandidate } from './types';
 
 interface FetcherEvent {
   sourceNames?: string[];
@@ -19,8 +19,11 @@ interface FetcherEvent {
  * 新闻抓取 Lambda 处理器
  */
 export const handler: Handler<EventBridgeEvent<'Scheduled Event', FetcherEvent>> = async (event, context) => {
+  console.log('🚀 Handler function called!');
+  console.log('🚀 Event received:', JSON.stringify(event, null, 2));
   const startTime = Date.now();
   const logger = createLambdaLogger('fetcher');
+  console.log('📝 Logger created successfully');
   
   logger.info('Starting news fetch process', {
     requestId: context.awsRequestId,
@@ -45,7 +48,7 @@ export const handler: Handler<EventBridgeEvent<'Scheduled Event', FetcherEvent>>
     const configLoader = new ConfigLoader();
     const store = new NewsStore();
     const deduplicator = new Deduplicator(store);
-    const rateLimiter = new RateLimiter(3, 10, 1000); // 3并发，每秒最多10个请求
+    const rateLimiter = new RateLimiter({ requestsPerMinute: 60, burstSize: 10 });
     
     const rssFetcher = new RSSFetcher();
     const webpageFetcher = new WebpageFetcher();
@@ -84,17 +87,23 @@ export const handler: Handler<EventBridgeEvent<'Scheduled Event', FetcherEvent>>
           intervalSec: source.intervalSec,
         });
         
-        // 使用速率限制器抓取候选项
-        const candidates = await rateLimiter.executeWithRetry(async () => {
-          if (source.type === 'rss') {
-            return await rssFetcher.fetchCandidates(source);
-          } else if (source.type === 'page') {
-            return await webpageFetcher.fetchCandidates(source);
-          } else {
-            console.warn(`⚠️  Unknown source type: ${source.type}`);
-            return [];
-          }
-        }, `fetch-${source.name}`);
+        // 创建源的限流器
+        if (source.rateLimit) {
+          rateLimiter.createBucket(source.name, source.rateLimit);
+        }
+        
+        // 等待令牌并抓取候选项
+        await rateLimiter.waitForToken(source.name);
+        let candidates: any[] = [];
+        
+        if (source.type === 'rss') {
+          candidates = await rssFetcher.fetchCandidates(source);
+        } else if (source.type === 'page') {
+          candidates = await webpageFetcher.fetchCandidates(source);
+        } else {
+          console.warn(`⚠️  Unknown source type: ${source.type}`);
+          candidates = [];
+        }
         
         console.log(`📊 Fetched ${candidates.length} candidates from ${source.name}`);
         
@@ -103,7 +112,8 @@ export const handler: Handler<EventBridgeEvent<'Scheduled Event', FetcherEvent>>
           stats.totalProcessed++;
           
           try {
-            await processCandidate(candidate, store, deduplicator, keywordEngine, keywordConfig, stats);
+            // 临时跳过数据库操作，只测试关键词匹配
+            await testCandidateKeywordMatching(candidate, keywordEngine, keywordConfig, stats);
           } catch (error) {
             stats.failedCount++;
             console.error(`❌ Failed to process candidate: ${candidate.title.substring(0, 50)}...`, error);
@@ -114,9 +124,6 @@ export const handler: Handler<EventBridgeEvent<'Scheduled Event', FetcherEvent>>
         console.error(`❌ Failed to process source ${source.name}:`, error);
       }
     }
-    
-    // 等待所有任务完成
-    await rateLimiter.waitForQueue();
     
     const duration = Date.now() - startTime;
     
@@ -204,6 +211,37 @@ export const handler: Handler<EventBridgeEvent<'Scheduled Event', FetcherEvent>>
 };
 
 /**
+ * 测试候选项的关键词匹配（跳过数据库操作）
+ */
+async function testCandidateKeywordMatching(
+  candidate: any,
+  keywordEngine: KeywordEngine,
+  keywordConfig: any,
+  stats: FetchStats
+): Promise<void> {
+  // 关键词匹配和评分
+  const matchResult = keywordEngine.evaluate({
+    title: candidate.title,
+    summary: candidate.summary,
+    source: candidate.source,
+    domain: candidate.domain,
+  });
+  
+  // 分数过滤
+  const minScore = keywordConfig.config?.minScore || 1;
+  if (matchResult.score < minScore) {
+    stats.filteredCount++;
+    console.log(`🚫 Filtering low-score article: ${candidate.title.substring(0, 50)}... (score: ${matchResult.score})`);
+    return;
+  }
+  
+  // 成功处理
+  stats.successCount++;
+  const tags = Array.from(matchResult.tags);
+  console.log(`✅ Matched article: ${candidate.title.substring(0, 50)}... (score: ${matchResult.score}, tags: [${tags.join(', ')}])`);
+}
+
+/**
  * 处理单个新闻候选项
  */
 async function processCandidate(
@@ -228,14 +266,16 @@ async function processCandidate(
   }
   
   // 3. 关键词匹配和评分
-  const matchResult = keywordEngine.matchArticle({
+  const matchResult = keywordEngine.evaluate({
     title: candidate.title,
     summary: candidate.summary,
-    url: candidate.url,
+    source: candidate.source,
+    domain: candidate.domain,
   });
   
   // 4. 分数过滤
-  if (matchResult.score < keywordConfig.minScore) {
+  const minScore = keywordConfig.config?.minScore || 1;
+  if (matchResult.score < minScore) {
     stats.filteredCount++;
     console.log(`🚫 Filtering low-score article: ${candidate.title.substring(0, 50)}... (score: ${matchResult.score})`);
     return;
@@ -249,7 +289,7 @@ async function processCandidate(
     sk: `ts#${epoch}#${urlHash}`,
     
     // GSI 键
-    GSI1PK: matchResult.tags.length > 0 ? `tag#${matchResult.tags[0]}` : `tag#general`,
+    GSI1PK: matchResult.tags.size > 0 ? `tag#${Array.from(matchResult.tags)[0]}` : `tag#general`,
     GSI1SK: candidate.publishedAt,
     GSI2PK: `source#${candidate.domain}`,
     GSI2SK: candidate.publishedAt,
@@ -264,10 +304,10 @@ async function processCandidate(
     summary: candidate.summary,
     publishedAt: candidate.publishedAt,
     lang: 'en', // 默认英文，可以后续添加语言检测
-    tags: matchResult.tags,
+    tags: Array.from(matchResult.tags),
     score: matchResult.score,
     isBigTech: matchResult.score >= 50, // 阈值可配置
-    isPolicy: matchResult.tags.some(tag => tag.includes('policy')),
+    isPolicy: Array.from(matchResult.tags).some(tag => tag.includes('policy')),
     
     // 元数据
     createdAt: getCurrentTimestamp(),

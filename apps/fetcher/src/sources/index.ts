@@ -1,2 +1,2 @@
-export { RSSFetcher } from './rss-fetcher.js';
-export { WebpageFetcher } from './webpage-fetcher.js';
+export { RSSFetcher } from './rss-fetcher';
+export { WebpageFetcher } from './webpage-fetcher';

@@ -1,6 +1,6 @@
 import { NewsStore } from '@news-agg/store';
 import { jaccard, normalizeTitle, normalizeUrl, hash } from '@news-agg/shared';
-import { NewsCandidate } from './types.js';
+import { NewsCandidate } from './types';
 
 /**
  * 去重器 - 检查新闻候选项是否重复
