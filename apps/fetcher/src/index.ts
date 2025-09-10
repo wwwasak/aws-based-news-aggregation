@@ -112,8 +112,8 @@ export const handler: Handler<EventBridgeEvent<'Scheduled Event', FetcherEvent>>
           stats.totalProcessed++;
           
           try {
-            // 临时跳过数据库操作，只测试关键词匹配
-            await testCandidateKeywordMatching(candidate, keywordEngine, keywordConfig, stats);
+            // 完整处理候选项，包括保存到数据库
+            await processCandidate(candidate, store, deduplicator, keywordEngine, keywordConfig, stats);
           } catch (error) {
             stats.failedCount++;
             console.error(`❌ Failed to process candidate: ${candidate.title.substring(0, 50)}...`, error);

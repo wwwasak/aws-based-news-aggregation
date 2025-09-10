@@ -2,7 +2,7 @@
  * DynamoDB 表名和索引名常量
  */
 export const TABLE_NAMES = {
-  NEWS_ARTICLES: 'NewsArticles',
+  NEWS_ARTICLES: 'articles',
 } as const;
 
 export const INDEX_NAMES = {
