@@ -142,18 +142,77 @@ rules:
     addTags: [security, incident, urgent]
     weight: 5
 
-# 评分阈值配置
+  # 广泛科技相关 (宽松收录)
+  - name: general_tech
+    description: "广泛的科技相关新闻"
+    any:
+      - "\\b(technology|tech|digital|software|hardware|internet|web|mobile|app|platform|startup|innovation)\\b"
+      - "\\b(programming|developer|coding|algorithm|database|API|framework|library)\\b"
+      - "\\b(cybersecurity|blockchain|cryptocurrency|fintech|healthtech|edtech|cleantech)\\b"
+      - "\\b(robotics|automation|IoT|5G|6G|VR|AR|metaverse|quantum|semiconductor)\\b"
+    addTags: [technology, general]
+    weight: 2
+
+  # 宏观经济相关
+  - name: macro_economics
+    description: "宏观经济相关新闻"
+    any:
+      - "\\b(economy|economic|GDP|inflation|recession|recovery|growth|market|stock|bond|currency)\\b"
+      - "\\b(Federal Reserve|Fed|central bank|interest rate|monetary policy|fiscal policy)\\b"
+      - "\\b(trade|tariff|export|import|supply chain|manufacturing|employment|unemployment)\\b"
+      - "\\b(energy|oil|gas|renewable|climate|sustainability|ESG|green|carbon)\\b"
+    addTags: [economics, macro, finance]
+    weight: 3
+
+  # 商业和投资
+  - name: business_investment
+    description: "商业、投资和市场相关新闻"
+    any:
+      - "\\b(business|investment|venture|capital|funding|IPO|merger|acquisition|valuation)\\b"
+      - "\\b(earnings|revenue|profit|loss|quarterly|annual|financial|budget)\\b"
+      - "\\b(market cap|shares|dividend|stock price|trading|exchange|nasdaq|NYSE)\\b"
+      - "\\b(startup|unicorn|scale-up|entrepreneur|founder|CEO|CFO|CTO)\\b"
+    addTags: [business, investment, market]
+    weight: 2
+
+  # 政策和监管 (宽松)
+  - name: policy_regulation_broad
+    description: "政策、监管和法律相关新闻"
+    any:
+      - "\\b(policy|regulation|law|legal|government|congress|senate|bill|legislation)\\b"
+      - "\\b(antitrust|monopoly|competition|privacy|data protection|GDPR|compliance)\\b"
+      - "\\b(tax|taxation|subsidy|incentive|grant|public|federal|state)\\b"
+      - "\\b(election|political|vote|campaign|democracy|reform)\\b"
+    addTags: [policy, regulation, government]
+    weight: 2
+
+  # 全球化和国际
+  - name: global_international
+    description: "全球化和国际相关新闻"
+    any:
+      - "\\b(global|international|worldwide|China|Europe|Asia|America|trade war)\\b"
+      - "\\b(geopolitical|diplomatic|sanctions|tariff|export control|supply chain)\\b"
+      - "\\b(emerging market|developing|BRICS|G7|G20|World Bank|IMF)\\b"
+      - "\\b(pandemic|crisis|disaster|climate change|sustainability)\\b"
+    addTags: [global, international, geopolitics]
+    weight: 2
+
+# 评分阈值配置 (更宽松)
 scoreThresholds:
   # 大科技公司相关文章的最低分数
-  bigtech: 4
+  bigtech: 3
   # 政策相关文章的最低分数  
-  policy: 3
+  policy: 2
   # AI 相关文章的最低分数
-  ai: 3
+  ai: 2
   # 突发新闻的最低分数
-  breaking: 5
+  breaking: 4
   # 安全事件的最低分数
-  security: 4
+  security: 3
+  # 科技相关的最低分数
+  technology: 2
+  # 经济相关的最低分数
+  economics: 2
 
 # 黑名单关键词 (降低分数或排除)
 blacklist:
@@ -167,9 +226,9 @@ blacklist:
   - speculation
   - unconfirmed
 
-# 全局配置
+# 全局配置 (宽松收录)
 config:
-  # 最低文章分数 (低于此分数的文章会被过滤)
+  # 最低文章分数 (更宽松，低于此分数的文章会被过滤)
   minScore: 1
   # 最高文章分数 (分数上限)
   maxScore: 100
@@ -177,5 +236,5 @@ config:
   caseSensitive: false
   # 是否启用词边界匹配
   wordBoundary: true
-  # 默认权重 (未匹配任何规则时)
-  defaultWeight: 1
+  # 默认权重 (未匹配任何规则时，给予基础分数以便收录更多内容)
+  defaultWeight: 2
