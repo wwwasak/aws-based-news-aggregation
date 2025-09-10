@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import * as yaml from 'js-yaml';
-import { type KeywordConfig } from '@news-agg/shared';
+import { type KeywordEngineConfig as KeywordConfig } from '@news-agg/keyword-engine';
 import { NewsSourceConfig, NewsSource, SourcesConfig } from './types';
 
 export class ConfigLoader {
@@ -202,27 +202,63 @@ export class ConfigLoader {
   private getDefaultKeywordConfig(): KeywordConfig {
     console.log('📝 Using default keyword configuration');
     return {
-      companies: {
-        apple: {
-          keywords: ['apple', 'iphone', 'ios'],
-          weight: 25,
-          tags: ['bigtech', 'company'],
+      companies: ['Apple', 'Microsoft', 'Google', 'Alphabet', 'Amazon', 'Meta', 'OpenAI'],
+      topics: ['AI', 'LLM', 'model', 'policy', 'regulation', 'antitrust', 'DOJ', 'FTC'],
+      rules: [
+        {
+          name: 'bigtech_ai_policy',
+          description: '大科技公司的AI和政策相关新闻',
+          any: [
+            '$company\\b.*(AI|LLM|model|policy|regulation|antitrust|FTC|DOJ)',
+            '(AI|LLM|model|policy|regulation|antitrust|FTC|DOJ).*$company\\b',
+          ],
+          addTags: ['bigtech', 'ai', 'policy'],
+          weight: 5,
         },
-        google: {
-          keywords: ['google', 'android', 'chrome'],
-          weight: 25,
-          tags: ['bigtech', 'company'],
+        {
+          name: 'cloud_infra',
+          description: '云计算和基础设施相关新闻',
+          any: [
+            '\\b(cloud|datacenter|GPU|TPU|inference|training)\\b.*$company\\b',
+          ],
+          addTags: ['bigtech', 'cloud'],
+          weight: 3,
         },
+        {
+          name: 'breaking_news',
+          description: '突发新闻标识符',
+          any: [
+            '^\\s*(BREAKING|URGENT|ALERT|JUST IN)',
+            '\\b(breaking|urgent|alert)\\b',
+          ],
+          addTags: ['breaking', 'urgent'],
+          weight: 6,
+        },
+        {
+          name: 'general_tech',
+          description: '一般科技新闻',
+          any: [
+            '\\b(technology|software|hardware|digital|mobile)\\b',
+          ],
+          addTags: ['technology', 'general'],
+          weight: 2,
+        },
+      ],
+      scoreThresholds: {
+        bigtech: 4,
+        policy: 3,
+        ai: 3,
+        breaking: 5,
+        technology: 2,
       },
-      topics: {
-        ai: {
-          keywords: ['artificial intelligence', 'machine learning', 'ai'],
-          weight: 20,
-          tags: ['ai', 'technology'],
-        },
+      blacklist: ['advertisement', 'sponsored', 'promotional'],
+      config: {
+        minScore: 1,
+        maxScore: 100,
+        caseSensitive: false,
+        wordBoundary: true,
+        defaultWeight: 1,
       },
-      blacklist: ['advertisement', 'sponsored'],
-      minScore: 10,
     };
   }
 }

@@ -80,27 +80,7 @@ sources:
       requestsPerMinute: 8
       burstSize: 3
 
-  # 特殊页面抓取源 (高频率)
-  - name: Techmeme
-    type: page
-    url: https://www.techmeme.com/
-    weight: 3
-    intervalSec: 1200  # 20分钟（高优先级，但仍需优化）
-    enabled: true
-    description: "Technology news aggregation and curation"
-    tags: ["tech", "aggregation", "breaking"]
-    rateLimit:
-      requestsPerMinute: 12
-      burstSize: 6
-    pageConfig:
-      # Techmeme 特定的抓取配置
-      selectors:
-        title: ".ourh"
-        link: ".ourh a"
-        summary: ".excerpt"
-        timestamp: ".timestamp"
-      followLinks: false
-      maxItems: 50
+  
 
   # 备用和实验性源 (可选启用)
   - name: Ars Technica
@@ -108,7 +88,7 @@ sources:
     url: https://feeds.arstechnica.com/arstechnica/index
     weight: 2
     intervalSec: 1200  # 20分钟
-    enabled: false  # 默认禁用，可按需启用
+    enabled: true  # 默认禁用，可按需启用
     description: "In-depth technology news and analysis"
     tags: ["tech", "analysis", "deep-dive"]
     rateLimit:
@@ -120,7 +100,7 @@ sources:
     url: https://www.theverge.com/rss/index.xml
     weight: 2
     intervalSec: 1200  # 20分钟
-    enabled: false  # 默认禁用
+    enabled: true  # 默认禁用
     description: "Technology, science, art, and culture"
     tags: ["tech", "culture", "reviews"]
     rateLimit:
@@ -133,7 +113,7 @@ sources:
     url: http://feeds.bbci.co.uk/news/technology/rss.xml
     weight: 1
     intervalSec: 1800  # 30分钟
-    enabled: false
+    enabled: true
     description: "BBC Technology news section"
     tags: ["tech", "international", "bbc"]
     rateLimit:
@@ -145,7 +125,7 @@ sources:
     url: https://www.reuters.com/technology/feed/
     weight: 2
     intervalSec: 1800  # 30分钟
-    enabled: false
+    enabled: true
     description: "Reuters Technology news"
     tags: ["tech", "business", "international"]
     rateLimit:

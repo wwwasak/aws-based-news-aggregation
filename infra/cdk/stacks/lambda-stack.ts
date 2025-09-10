@@ -46,6 +46,26 @@ export class LambdaStack extends Stack {
         target: 'es2022',
         mainFields: ['module', 'main'],
         externalModules: ['@aws-sdk/*', 'aws-lambda', 'fs', 'path'],
+        commandHooks: {
+          beforeBundling(inputDir: string, outputDir: string): string[] {
+            return [];
+          },
+          afterBundling(inputDir: string, outputDir: string): string[] {
+            const isWindows = process.platform === 'win32';
+            if (isWindows) {
+              return [
+                `xcopy "${inputDir}\\configs" "${outputDir}\\configs\\" /E /I /Y`,
+              ];
+            } else {
+              return [
+                `cp -r ${inputDir}/configs ${outputDir}/`,
+              ];
+            }
+          },
+          beforeInstall(): string[] {
+            return [];
+          },
+        },
       },
     };
 
