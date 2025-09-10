@@ -219,7 +219,13 @@ blacklist:
   - advertisement
   - sponsored
   - "ad content"
- 
+  - promotional
+  - marketing
+  - "press release"
+  - rumors
+  - speculation
+  - unconfirmed
+
 # 全局配置 (宽松收录)
 config:
   # 最低文章分数 (更宽松，低于此分数的文章会被过滤)

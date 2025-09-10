@@ -17,22 +17,46 @@ export class ConfigLoader {
    */
   loadSources(): SourcesConfig {
     try {
-      // 在Lambda环境中，直接使用默认配置避免文件系统访问问题
-      if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
-        console.log('🔧 Using default configuration in Lambda environment');
-        return this.getDefaultSourcesConfig();
+      // 尝试多个可能的配置文件路径
+      const possiblePaths = [
+        join(this.configPath, 'sources.yaml'),
+        join(process.cwd(), 'configs', 'sources.yaml'),
+        join(__dirname, '../../configs/sources.yaml'),
+        join(__dirname, '../../../configs/sources.yaml'),
+        '/opt/configs/sources.yaml', // Lambda层中的配置
+      ];
+
+      let config: SourcesConfig | null = null;
+      let loadedPath = '';
+
+      for (const sourcesPath of possiblePaths) {
+        try {
+          console.log(`🔍 Trying to load config from: ${sourcesPath}`);
+          const content = readFileSync(sourcesPath, 'utf8');
+          config = yaml.load(content) as SourcesConfig;
+          loadedPath = sourcesPath;
+          break;
+        } catch (pathError) {
+          console.log(`⚠️  Config not found at: ${sourcesPath}`);
+        }
       }
-      
-      const sourcesPath = join(this.configPath, 'sources.yaml');
-      const content = readFileSync(sourcesPath, 'utf8');
-      const config = yaml.load(content) as SourcesConfig;
-      
-      console.log('✅ Loaded news sources configuration');
-      console.log(`   📊 Found ${config.sources.length} sources (${config.sources.filter(s => s.enabled).length} enabled)`);
-      
-      return config;
+
+      if (config) {
+        console.log(`✅ Loaded news sources configuration from: ${loadedPath}`);
+        console.log(`   📊 Found ${config.sources.length} sources (${config.sources.filter(s => s.enabled).length} enabled)`);
+        
+        // 验证配置结构
+        if (!config.sources || !Array.isArray(config.sources)) {
+          throw new Error('Invalid configuration: sources array not found');
+        }
+        
+        return config;
+      } else {
+        throw new Error('Could not load configuration from any path');
+      }
     } catch (error) {
       console.error('❌ Failed to load sources config:', error);
+      console.log('🔄 Falling back to default configuration');
       return this.getDefaultSourcesConfig();
     }
   }
@@ -42,20 +66,39 @@ export class ConfigLoader {
    */
   loadKeywords(): KeywordConfig {
     try {
-      // 在Lambda环境中，直接使用默认配置避免文件系统访问问题
-      if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
-        console.log('🔧 Using default keyword configuration in Lambda environment');
-        return this.getDefaultKeywordConfig();
+      // 尝试多个可能的配置文件路径
+      const possiblePaths = [
+        join(this.configPath, 'keywords.yaml'),
+        join(process.cwd(), 'configs', 'keywords.yaml'),
+        join(__dirname, '../../configs/keywords.yaml'),
+        join(__dirname, '../../../configs/keywords.yaml'),
+        '/opt/configs/keywords.yaml', // Lambda层中的配置
+      ];
+
+      let config: KeywordConfig | null = null;
+      let loadedPath = '';
+
+      for (const keywordsPath of possiblePaths) {
+        try {
+          console.log(`🔍 Trying to load keywords from: ${keywordsPath}`);
+          const content = readFileSync(keywordsPath, 'utf8');
+          config = yaml.load(content) as KeywordConfig;
+          loadedPath = keywordsPath;
+          break;
+        } catch (pathError) {
+          console.log(`⚠️  Keywords config not found at: ${keywordsPath}`);
+        }
       }
-      
-      const keywordsPath = join(this.configPath, 'keywords.yaml');
-      const content = readFileSync(keywordsPath, 'utf8');
-      const config = yaml.load(content) as KeywordConfig;
-      
-      console.log('✅ Loaded keyword configuration');
-      return config;
+
+      if (config) {
+        console.log(`✅ Loaded keyword configuration from: ${loadedPath}`);
+        return config;
+      } else {
+        throw new Error('Could not load keywords configuration from any path');
+      }
     } catch (error) {
       console.error('❌ Failed to load keywords config:', error);
+      console.log('🔄 Falling back to default keyword configuration');
       return this.getDefaultKeywordConfig();
     }
   }
