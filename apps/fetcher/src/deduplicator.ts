@@ -42,13 +42,17 @@ export class Deduplicator {
    */
   private async checkUrlDuplicate(urlHash: string): Promise<boolean> {
     try {
-      // 使用 GSI2 按来源查询最近文章，然后检查 urlHash
-      // 这里简化实现，实际可以优化查询策略
-      const recentWindow = new Date(Date.now() - this.cacheExpiry).toISOString();
+      // 更新缓存以确保有最新数据
+      await this.updateRecentArticlesCache();
       
-      // 注意：这是简化实现，实际应该使用更高效的查询方式
-      // 在生产环境中可以考虑使用 ElastiCache 或者专门的去重表
-      return false; // 暂时返回 false，让标题相似度检查处理
+      // 检查缓存中是否存在相同的URL哈希
+      for (const [cachedUrlHash] of this.recentArticlesCache) {
+        if (cachedUrlHash === urlHash) {
+          return true;
+        }
+      }
+      
+      return false;
     } catch (error) {
       console.warn('⚠️  Failed to check URL duplicate:', error);
       return false;
@@ -97,8 +101,8 @@ export class Deduplicator {
       this.recentArticlesCache.clear();
 
       // 查询最近 48 小时的文章
-      // 这里使用 BigTech 查询作为示例，实际应该查询所有最近文章
-      const recentArticles = await this.store.queryBigTech({
+      // 使用扫描获取所有最近文章，而不只是BigTech文章
+      const recentArticles = await this.store.scanRecentArticles({
         limit: 500,
         startTime: recentWindow,
       });

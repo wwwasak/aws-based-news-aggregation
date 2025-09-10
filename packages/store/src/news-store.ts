@@ -247,6 +247,42 @@ export class NewsStore {
   }
 
   /**
+   * 扫描最近的文章（用于去重）
+   */
+  async scanRecentArticles(params: QueryParams = {}): Promise<{
+    items: NewsArticle[];
+    nextToken?: string;
+  }> {
+    const { limit = 500, nextToken, startTime } = params;
+    
+    let filterExpression = '';
+    const expressionAttributeValues: Record<string, any> = {};
+
+    // 添加时间范围过滤
+    if (startTime) {
+      filterExpression = 'publishedAt >= :startTime';
+      expressionAttributeValues[':startTime'] = startTime;
+    }
+
+    const command = new ScanCommand({
+      TableName: this.tableName,
+      FilterExpression: filterExpression || undefined,
+      ExpressionAttributeValues: Object.keys(expressionAttributeValues).length > 0 ? expressionAttributeValues : undefined,
+      Limit: limit,
+      ExclusiveStartKey: nextToken ? JSON.parse(nextToken) : undefined,
+    });
+
+    const result = await dynamoClient.send(command);
+
+    const items = (result.Items as NewsArticle[]) || [];
+
+    return {
+      items,
+      nextToken: result.LastEvaluatedKey ? JSON.stringify(result.LastEvaluatedKey) : undefined,
+    };
+  }
+
+  /**
    * 生成标签时间复合键
    */
   private generateTagTimeKey(tags: string[], publishedAt: string): string {
