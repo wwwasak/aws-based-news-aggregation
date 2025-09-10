@@ -30,7 +30,7 @@ export class LambdaStack extends Stack {
 
     // 通用 Lambda 配置（免费额度优化）
     const commonLambdaProps: Partial<NodejsFunctionProps> = {
-      runtime: Runtime.NODEJS_18_X,
+      runtime: Runtime.NODEJS_20_X,
       architecture: Architecture.ARM_64,
       timeout: Duration.seconds(90), // 降低超时时间以减少成本
       memorySize: 256, // 降低内存以减少成本
