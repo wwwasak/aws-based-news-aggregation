@@ -73,7 +73,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, className = '' }) =
   };
 
   return (
-    <article className={`group card-elevated hover:shadow-glow-lg transition-all duration-500 cursor-pointer ${className}`}>
+    <article className={`group card-elevated hover:shadow-glow-lg transition-all duration-500 cursor-pointer overflow-hidden ${className}`}>
       <div onClick={handleOpenArticle} className="space-y-2 md:space-y-4">
         {/* 头部区域 - 标题 */}
         <div className="flex-1 min-w-0">
@@ -95,22 +95,22 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, className = '' }) =
 
         {/* 标签区域 - 移动端紧凑布局 */}
         {article.tags && article.tags.length > 0 && (
-          <div className="space-y-1 md:space-y-2">
+          <div className="space-y-1 md:space-y-2 min-w-0">
             <div className="flex items-center gap-2 text-gray-400">
-              <Tag className="w-3 h-3 md:w-4 md:h-4" />
+              <Tag className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
               <span className="text-xs font-medium">分类</span>
             </div>
-            <div className="flex flex-wrap gap-1 md:gap-1.5">
+            <div className="flex flex-wrap gap-1 md:gap-1.5 min-w-0">
               {article.tags.slice(0, 3).map((tag, index) => (
                 <span
                   key={index}
-                  className={`tag ${getTagClassName(tag)} hover:scale-105 transition-transform duration-200 text-xs px-2 py-0.5`}
+                  className={`tag ${getTagClassName(tag)} hover:scale-105 transition-transform duration-200 text-xs px-2 py-0.5 flex-shrink-0`}
                 >
                   {tag}
                 </span>
               ))}
               {article.tags.length > 3 && (
-                <span className="tag tag-default text-xs px-2 py-0.5">
+                <span className="tag tag-default text-xs px-2 py-0.5 flex-shrink-0">
                   +{article.tags.length - 3}
                 </span>
               )}
@@ -121,21 +121,21 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, className = '' }) =
         {/* 底部信息区域 - 移动端紧凑布局 */}
         <div className="flex flex-col gap-2 md:gap-3 pt-2 md:pt-3 border-t border-gray-100">
           {/* 第一行：时间、来源、评分 - 移动端横向排列 */}
-          <div className="flex flex-wrap items-center gap-2 md:gap-3 text-xs text-gray-500">
+          <div className="flex flex-wrap items-center gap-2 md:gap-3 text-xs text-gray-500 min-w-0">
             {/* 发布时间 */}
-            <div className="flex items-center gap-1.5">
-              <Calendar className="w-3 h-3 text-gray-400" />
-              <span className="font-medium">{formatPublishTime(article.publishedAt)}</span>
+            <div className="flex items-center gap-1.5 flex-shrink-0 min-w-0">
+              <Calendar className="w-3 h-3 text-gray-400 flex-shrink-0" />
+              <span className="font-medium truncate">{formatPublishTime(article.publishedAt)}</span>
             </div>
             
             {/* 分隔符 */}
-            <div className="w-1 h-1 bg-gray-300 rounded-full hidden sm:block" />
+            <div className="w-1 h-1 bg-gray-300 rounded-full hidden sm:block flex-shrink-0" />
             
             {/* 新闻源 */}
             {article.source && (
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 bg-primary-500 rounded-full animate-pulse" />
-                <span className="font-semibold text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded text-xs">
+              <div className="flex items-center gap-1.5 flex-shrink-0 min-w-0">
+                <div className="w-1.5 h-1.5 bg-primary-500 rounded-full animate-pulse flex-shrink-0" />
+                <span className="font-semibold text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded text-xs truncate">
                   {article.source}
                 </span>
               </div>
@@ -144,8 +144,8 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, className = '' }) =
             {/* 评分显示 - 移动端紧凑 */}
             {article.score > 0 && (
               <>
-                <div className="w-1 h-1 bg-gray-300 rounded-full hidden sm:block" />
-                <div className={`badge ${getScoreBadgeClass(article.score)} flex items-center gap-1 px-1.5 py-0.5`}>
+                <div className="w-1 h-1 bg-gray-300 rounded-full hidden sm:block flex-shrink-0" />
+                <div className={`badge ${getScoreBadgeClass(article.score)} flex items-center gap-1 px-1.5 py-0.5 flex-shrink-0`}>
                   {getScoreIcon(article.score)}
                   <span className="font-semibold text-xs">{article.score}</span>
                 </div>

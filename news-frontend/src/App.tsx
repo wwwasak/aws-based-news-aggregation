@@ -447,11 +447,11 @@ function App() {
             ) : (
               <>
                 {/* 新闻卡片网格 - 响应式布局 */}
-                <div className="grid gap-4 md:gap-6">
+                <div className="grid grid-cols-1 gap-4 md:gap-6">
                   {filteredArticles.map((article, index) => (
                     <div
                       key={`${article.id}-${index}`}
-                      className="animate-fade-in-up"
+                      className="animate-fade-in-up w-full"
                       style={{ animationDelay: `${index * 0.05}s` }}
                     >
                       <NewsCard article={article} />
