@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExternalLink, Calendar, Tag, Clock, TrendingUp, Star } from 'lucide-react';
+import { ExternalLink, Calendar, Tag, Award, Zap, Target } from 'lucide-react';
 import { TAG_COLORS } from '../types';
 import type { NewsArticle } from '../types';
 
@@ -59,9 +59,9 @@ function getScoreBadgeClass(score: number): string {
  * 获取评分图标
  */
 function getScoreIcon(score: number) {
-  if (score >= 80) return <Star className="w-3 h-3" />;
-  if (score >= 60) return <TrendingUp className="w-3 h-3" />;
-  return <Clock className="w-3 h-3" />;
+  if (score >= 80) return <Award className="w-3 h-3" />;
+  if (score >= 60) return <Zap className="w-3 h-3" />;
+  return <Target className="w-3 h-3" />;
 }
 
 /**
@@ -74,24 +74,12 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, className = '' }) =
 
   return (
     <article className={`group card-elevated hover:shadow-glow-lg transition-all duration-500 cursor-pointer ${className}`}>
-      <div onClick={handleOpenArticle} className="space-y-3 md:space-y-4">
-        {/* 头部区域 - 响应式布局 */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
-          <div className="flex-1 min-w-0">
-            <h2 className="text-base md:text-lg lg:text-xl font-bold text-gray-900 line-clamp-2 group-hover:text-gradient transition-all duration-300 leading-tight">
-              {article.title}
-            </h2>
-          </div>
-          
-          {/* 评分徽章 - 移动端优化 */}
-          {article.score > 0 && (
-            <div className="flex-shrink-0 self-start">
-              <div className={`badge ${getScoreBadgeClass(article.score)} flex items-center gap-1`}>
-                {getScoreIcon(article.score)}
-                <span className="font-semibold text-xs md:text-sm">{article.score}</span>
-              </div>
-            </div>
-          )}
+      <div onClick={handleOpenArticle} className="space-y-2 md:space-y-4">
+        {/* 头部区域 - 标题 */}
+        <div className="flex-1 min-w-0">
+          <h2 className="text-base md:text-lg lg:text-xl font-bold text-gray-900 line-clamp-2 group-hover:text-gradient transition-all duration-300 leading-tight">
+            {article.title}
+          </h2>
         </div>
 
         {/* 摘要区域 - 移动端优化 */}
@@ -105,24 +93,24 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, className = '' }) =
           </div>
         )}
 
-        {/* 标签区域 - 响应式布局 */}
+        {/* 标签区域 - 移动端紧凑布局 */}
         {article.tags && article.tags.length > 0 && (
-          <div className="space-y-2">
+          <div className="space-y-1 md:space-y-2">
             <div className="flex items-center gap-2 text-gray-400">
               <Tag className="w-3 h-3 md:w-4 md:h-4" />
               <span className="text-xs font-medium">分类</span>
             </div>
-            <div className="flex flex-wrap gap-1.5 md:gap-2">
+            <div className="flex flex-wrap gap-1 md:gap-1.5">
               {article.tags.slice(0, 3).map((tag, index) => (
                 <span
                   key={index}
-                  className={`tag ${getTagClassName(tag)} hover:scale-105 transition-transform duration-200 text-xs`}
+                  className={`tag ${getTagClassName(tag)} hover:scale-105 transition-transform duration-200 text-xs px-2 py-0.5`}
                 >
                   {tag}
                 </span>
               ))}
               {article.tags.length > 3 && (
-                <span className="tag tag-default text-xs">
+                <span className="tag tag-default text-xs px-2 py-0.5">
                   +{article.tags.length - 3}
                 </span>
               )}
@@ -130,38 +118,51 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, className = '' }) =
           </div>
         )}
 
-        {/* 底部信息区域 - 响应式布局 */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 md:pt-4 border-t border-gray-100">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs md:text-sm text-gray-500">
+        {/* 底部信息区域 - 移动端紧凑布局 */}
+        <div className="flex flex-col gap-2 md:gap-3 pt-2 md:pt-3 border-t border-gray-100">
+          {/* 第一行：时间、来源、评分 - 移动端横向排列 */}
+          <div className="flex flex-wrap items-center gap-2 md:gap-3 text-xs text-gray-500">
             {/* 发布时间 */}
-            <div className="flex items-center gap-2">
-              <div className="p-1 md:p-1.5 bg-gray-100 rounded-lg">
-                <Calendar className="w-3 h-3 md:w-4 md:h-4 text-gray-600" />
-              </div>
+            <div className="flex items-center gap-1.5">
+              <Calendar className="w-3 h-3 text-gray-400" />
               <span className="font-medium">{formatPublishTime(article.publishedAt)}</span>
             </div>
             
+            {/* 分隔符 */}
+            <div className="w-1 h-1 bg-gray-300 rounded-full hidden sm:block" />
+            
             {/* 新闻源 */}
             {article.source && (
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-primary-500 rounded-full animate-pulse" />
-                <span className="font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded-lg text-xs">
+              <div className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 bg-primary-500 rounded-full animate-pulse" />
+                <span className="font-semibold text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded text-xs">
                   {article.source}
                 </span>
               </div>
             )}
+            
+            {/* 评分显示 - 移动端紧凑 */}
+            {article.score > 0 && (
+              <>
+                <div className="w-1 h-1 bg-gray-300 rounded-full hidden sm:block" />
+                <div className={`badge ${getScoreBadgeClass(article.score)} flex items-center gap-1 px-1.5 py-0.5`}>
+                  {getScoreIcon(article.score)}
+                  <span className="font-semibold text-xs">{article.score}</span>
+                </div>
+              </>
+            )}
           </div>
           
-          {/* 阅读按钮 - 移动端优化 */}
+          {/* 第二行：阅读按钮 - 移动端全宽 */}
           <button 
-            className="btn-ghost group/btn flex items-center justify-center sm:justify-start gap-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 transition-all duration-200 text-sm md:text-base py-2 px-3 rounded-lg"
+            className="btn-ghost group/btn flex items-center justify-center gap-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 transition-all duration-200 text-sm py-2 px-3 rounded-lg w-full sm:w-auto"
             onClick={(e) => {
               e.stopPropagation();
               handleOpenArticle();
             }}
           >
             <span className="font-semibold">阅读原文</span>
-            <ExternalLink className="w-3 h-3 md:w-4 md:h-4 group-hover/btn:translate-x-0.5 transition-transform duration-200" />
+            <ExternalLink className="w-3 h-3 group-hover/btn:translate-x-0.5 transition-transform duration-200" />
           </button>
         </div>
 
