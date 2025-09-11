@@ -65,7 +65,7 @@ function getScoreIcon(score: number) {
 }
 
 /**
- * 现代化新闻卡片组件
+ * 现代化响应式新闻卡片组件
  */
 export const NewsCard: React.FC<NewsCardProps> = ({ article, className = '' }) => {
   const handleOpenArticle = () => {
@@ -74,69 +74,69 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, className = '' }) =
 
   return (
     <article className={`group card-elevated hover:shadow-glow-lg transition-all duration-500 cursor-pointer ${className}`}>
-      <div onClick={handleOpenArticle} className="space-y-4">
-        {/* 头部区域 */}
-        <div className="flex justify-between items-start gap-4">
+      <div onClick={handleOpenArticle} className="space-y-3 md:space-y-4">
+        {/* 头部区域 - 响应式布局 */}
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
           <div className="flex-1 min-w-0">
-            <h2 className="text-xl font-bold text-gray-900 line-clamp-2 group-hover:text-gradient transition-all duration-300 leading-tight">
+            <h2 className="text-base md:text-lg lg:text-xl font-bold text-gray-900 line-clamp-2 group-hover:text-gradient transition-all duration-300 leading-tight">
               {article.title}
             </h2>
           </div>
           
-          {/* 评分徽章 */}
+          {/* 评分徽章 - 移动端优化 */}
           {article.score > 0 && (
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 self-start">
               <div className={`badge ${getScoreBadgeClass(article.score)} flex items-center gap-1`}>
                 {getScoreIcon(article.score)}
-                <span className="font-semibold">{article.score}</span>
+                <span className="font-semibold text-xs md:text-sm">{article.score}</span>
               </div>
             </div>
           )}
         </div>
 
-        {/* 摘要区域 */}
+        {/* 摘要区域 - 移动端优化 */}
         {article.summary && (
           <div className="relative">
-            <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 group-hover:text-gray-700 transition-colors duration-300">
+            <p className="text-sm md:text-base text-gray-600 leading-relaxed line-clamp-2 md:line-clamp-3 group-hover:text-gray-700 transition-colors duration-300">
               {article.summary}
             </p>
-            {/* 渐变遮罩效果 */}
-            <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+            {/* 渐变遮罩效果 - 移动端隐藏 */}
+            <div className="absolute bottom-0 left-0 right-0 h-6 md:h-8 bg-gradient-to-t from-white to-transparent pointer-events-none hidden md:block" />
           </div>
         )}
 
-        {/* 标签区域 */}
+        {/* 标签区域 - 响应式布局 */}
         {article.tags && article.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
+          <div className="space-y-2">
             <div className="flex items-center gap-2 text-gray-400">
-              <Tag className="w-4 h-4" />
+              <Tag className="w-3 h-3 md:w-4 md:h-4" />
               <span className="text-xs font-medium">分类</span>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {article.tags.slice(0, 4).map((tag, index) => (
+            <div className="flex flex-wrap gap-1.5 md:gap-2">
+              {article.tags.slice(0, 3).map((tag, index) => (
                 <span
                   key={index}
-                  className={`tag ${getTagClassName(tag)} hover:scale-105 transition-transform duration-200`}
+                  className={`tag ${getTagClassName(tag)} hover:scale-105 transition-transform duration-200 text-xs`}
                 >
                   {tag}
                 </span>
               ))}
-              {article.tags.length > 4 && (
-                <span className="tag tag-default">
-                  +{article.tags.length - 4}
+              {article.tags.length > 3 && (
+                <span className="tag tag-default text-xs">
+                  +{article.tags.length - 3}
                 </span>
               )}
             </div>
           </div>
         )}
 
-        {/* 底部信息区域 */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-          <div className="flex items-center gap-4 text-sm text-gray-500">
+        {/* 底部信息区域 - 响应式布局 */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 md:pt-4 border-t border-gray-100">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs md:text-sm text-gray-500">
             {/* 发布时间 */}
             <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-gray-100 rounded-lg">
-                <Calendar className="w-4 h-4 text-gray-600" />
+              <div className="p-1 md:p-1.5 bg-gray-100 rounded-lg">
+                <Calendar className="w-3 h-3 md:w-4 md:h-4 text-gray-600" />
               </div>
               <span className="font-medium">{formatPublishTime(article.publishedAt)}</span>
             </div>
@@ -144,24 +144,24 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, className = '' }) =
             {/* 新闻源 */}
             {article.source && (
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse" />
-                <span className="font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded-lg">
+                <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-primary-500 rounded-full animate-pulse" />
+                <span className="font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded-lg text-xs">
                   {article.source}
                 </span>
               </div>
             )}
           </div>
           
-          {/* 阅读按钮 */}
+          {/* 阅读按钮 - 移动端优化 */}
           <button 
-            className="btn-ghost group/btn flex items-center gap-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 transition-all duration-200"
+            className="btn-ghost group/btn flex items-center justify-center sm:justify-start gap-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 transition-all duration-200 text-sm md:text-base py-2 px-3 rounded-lg"
             onClick={(e) => {
               e.stopPropagation();
               handleOpenArticle();
             }}
           >
-            <span className="text-sm font-semibold">阅读原文</span>
-            <ExternalLink className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform duration-200" />
+            <span className="font-semibold">阅读原文</span>
+            <ExternalLink className="w-3 h-3 md:w-4 md:h-4 group-hover/btn:translate-x-0.5 transition-transform duration-200" />
           </button>
         </div>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Newspaper, Wifi, WifiOff, Sparkles, TrendingUp, Clock } from 'lucide-react';
+import { Newspaper, Wifi, WifiOff, Sparkles, TrendingUp, Clock, Menu, X } from 'lucide-react';
 import { 
   NewsCard, 
   SearchBar, 
@@ -11,7 +11,7 @@ import { NewsApiService, ApiError } from './services/api';
 import type { NewsArticle, CategoryId } from './types';
 
 /**
- * 现代化主应用程序组件
+ * 现代化主应用程序组件 - 完全响应式设计
  */
 function App() {
   // 状态管理
@@ -25,6 +25,7 @@ function App() {
   const [nextCursor, setNextCursor] = useState<string | undefined>();
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // 网络状态监听
   useEffect(() => {
@@ -136,6 +137,7 @@ function App() {
     setSearchQuery(query);
     setIsSearchMode(true);
     setSelectedCategory('all');
+    setIsMobileMenuOpen(false); // 关闭移动端菜单
     searchNews(query);
   }, [searchNews]);
 
@@ -154,6 +156,7 @@ function App() {
    */
   const handleCategoryChange = useCallback((category: CategoryId) => {
     setSelectedCategory(category);
+    setIsMobileMenuOpen(false); // 关闭移动端菜单
     if (isSearchMode) {
       // 在搜索模式下，分类变更会过滤搜索结果
       return;
@@ -210,10 +213,11 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
-      {/* 现代化顶部导航栏 */}
+      {/* 响应式顶部导航栏 */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-soft border-b border-gray-200/50">
         <div className="container-modern">
-          <div className="flex items-center justify-between h-20">
+          {/* 桌面端导航 */}
+          <div className="hidden md:flex items-center justify-between h-20">
             {/* Logo区域 */}
             <div className="flex items-center space-x-4">
               <div className="relative">
@@ -222,7 +226,7 @@ function App() {
                 </div>
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-success-500 rounded-full border-2 border-white animate-pulse" />
               </div>
-      <div>
+              <div>
                 <h1 className="text-2xl font-bold text-gradient-hero">科技新闻聚合</h1>
                 <p className="text-sm text-gray-500 flex items-center gap-2">
                   <Sparkles className="w-3 h-3" />
@@ -254,22 +258,83 @@ function App() {
               </div>
             </div>
           </div>
-      </div>
+
+          {/* 移动端导航 */}
+          <div className="md:hidden flex items-center justify-between h-16 px-4">
+            {/* Logo */}
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl">
+                <Newspaper className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-lg font-bold text-gradient-hero">科技新闻</h1>
+                <p className="text-xs text-gray-500">实时资讯</p>
+              </div>
+            </div>
+            
+            {/* 移动端菜单按钮和状态 */}
+            <div className="flex items-center space-x-2">
+              {/* 网络状态 */}
+              <div className={`p-2 rounded-lg ${
+                isOnline ? 'bg-success-50 text-success-700' : 'bg-error-50 text-error-700'
+              }`}>
+                {isOnline ? (
+                  <Wifi className="w-4 h-4" />
+                ) : (
+                  <WifiOff className="w-4 h-4" />
+                )}
+              </div>
+              
+              {/* 菜单按钮 */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="w-5 h-5" />
+                ) : (
+                  <Menu className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* 移动端菜单 */}
+          {isMobileMenuOpen && (
+            <div className="md:hidden border-t border-gray-200/50 bg-white/95 backdrop-blur-sm">
+              <div className="px-4 py-4 space-y-4">
+                {/* 搜索栏 */}
+                <SearchBar
+                  onSearch={handleSearch}
+                  onClear={handleClearSearch}
+                  isLoading={loading}
+                  placeholder="搜索新闻..."
+                />
+                
+                {/* 分类筛选 */}
+                <CategoryFilter
+                  selectedCategory={selectedCategory}
+                  onCategoryChange={handleCategoryChange}
+                />
+              </div>
+            </div>
+          )}
+        </div>
       </header>
 
       {/* 主要内容区域 */}
-      <main className="container-modern py-8">
-        <div className="space-y-8">
-          {/* 搜索区域 */}
-          <div className="text-center space-y-4">
+      <main className="container-modern py-4 md:py-8">
+        <div className="space-y-6">
+          {/* 桌面端搜索区域 */}
+          <div className="hidden md:block text-center space-y-4">
             <div className="space-y-2">
               <h2 className="text-3xl font-bold text-gray-900">
                 发现最新科技动态
               </h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                 智能聚合全球科技新闻，为您提供最及时、最相关的科技资讯
-        </p>
-      </div>
+              </p>
+            </div>
             
             <div className="max-w-3xl mx-auto">
               <SearchBar
@@ -281,8 +346,27 @@ function App() {
             </div>
           </div>
 
-          {/* 分类筛选区域 */}
-          <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 shadow-soft border border-gray-200/50">
+          {/* 移动端搜索区域 */}
+          <div className="md:hidden space-y-4">
+            <div className="text-center space-y-2">
+              <h2 className="text-xl font-bold text-gray-900">
+                最新科技动态
+              </h2>
+              <p className="text-sm text-gray-600">
+                智能聚合全球科技新闻
+              </p>
+            </div>
+            
+            <SearchBar
+              onSearch={handleSearch}
+              onClear={handleClearSearch}
+              isLoading={loading}
+              placeholder="搜索新闻..."
+            />
+          </div>
+
+          {/* 桌面端分类筛选 */}
+          <div className="hidden md:block bg-white/60 backdrop-blur-sm rounded-3xl p-6 shadow-soft border border-gray-200/50">
             <CategoryFilter
               selectedCategory={selectedCategory}
               onCategoryChange={handleCategoryChange}
@@ -290,21 +374,19 @@ function App() {
           </div>
 
           {/* 状态信息区域 */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Clock className="w-4 h-4 text-primary-600" />
-                <span>
-                  {isSearchMode ? (
-                    <>搜索 "<span className="font-semibold text-primary-600">{searchQuery}</span>" 的结果</>
-                  ) : (
-                    '最新科技新闻'
-                  )}
-                </span>
-                <span className="px-2 py-1 bg-primary-100 text-primary-700 rounded-full text-xs font-medium">
-                  {filteredArticles.length} 条
-                </span>
-              </div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Clock className="w-4 h-4 text-primary-600" />
+              <span>
+                {isSearchMode ? (
+                  <>搜索 "<span className="font-semibold text-primary-600">{searchQuery}</span>" 的结果</>
+                ) : (
+                  '最新科技新闻'
+                )}
+              </span>
+              <span className="px-2 py-1 bg-primary-100 text-primary-700 rounded-full text-xs font-medium">
+                {filteredArticles.length} 条
+              </span>
             </div>
             
             {!isOnline && (
@@ -316,9 +398,9 @@ function App() {
           </div>
 
           {/* 新闻列表区域 */}
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6">
             {loading ? (
-              <div className="py-16">
+              <div className="py-12 md:py-16">
                 <LoadingSpinner size="xl" variant="news" />
               </div>
             ) : error ? (
@@ -329,22 +411,22 @@ function App() {
                 className="max-w-2xl mx-auto"
               />
             ) : filteredArticles.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="max-w-md mx-auto space-y-6">
+              <div className="text-center py-12 md:py-16">
+                <div className="max-w-md mx-auto space-y-4 md:space-y-6">
                   <div className="relative">
-                    <div className="w-24 h-24 mx-auto bg-gradient-to-r from-gray-100 to-gray-200 rounded-3xl flex items-center justify-center">
-                      <Newspaper className="w-12 h-12 text-gray-400" />
+                    <div className="w-16 h-16 md:w-24 md:h-24 mx-auto bg-gradient-to-r from-gray-100 to-gray-200 rounded-3xl flex items-center justify-center">
+                      <Newspaper className="w-8 h-8 md:w-12 md:h-12 text-gray-400" />
                     </div>
-                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                      <Sparkles className="w-4 h-4 text-primary-600" />
+                    <div className="absolute -top-1 -right-1 w-6 h-6 md:w-8 md:h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                      <Sparkles className="w-3 h-3 md:w-4 md:h-4 text-primary-600" />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <h3 className="text-xl font-bold text-gray-900">
+                    <h3 className="text-lg md:text-xl font-bold text-gray-900">
                       {isSearchMode ? '没有找到相关新闻' : '暂无新闻'}
                     </h3>
-                    <p className="text-gray-600 leading-relaxed">
+                    <p className="text-sm md:text-base text-gray-600 leading-relaxed">
                       {isSearchMode 
                         ? '尝试使用不同的关键词搜索，或者清除搜索查看所有新闻'
                         : '请稍后再试，或检查网络连接'
@@ -355,7 +437,7 @@ function App() {
                   {isSearchMode && (
                     <button
                       onClick={handleClearSearch}
-                      className="btn-primary"
+                      className="btn-primary text-sm md:text-base"
                     >
                       查看所有新闻
                     </button>
@@ -364,13 +446,13 @@ function App() {
               </div>
             ) : (
               <>
-                {/* 新闻卡片网格 */}
-                <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-1">
+                {/* 新闻卡片网格 - 响应式布局 */}
+                <div className="grid gap-4 md:gap-6">
                   {filteredArticles.map((article, index) => (
                     <div
                       key={`${article.id}-${index}`}
                       className="animate-fade-in-up"
-                      style={{ animationDelay: `${index * 0.1}s` }}
+                      style={{ animationDelay: `${index * 0.05}s` }}
                     >
                       <NewsCard article={article} />
                     </div>
@@ -379,14 +461,14 @@ function App() {
 
                 {/* 加载更多按钮 */}
                 {hasMore && (
-                  <div className="text-center py-8">
+                  <div className="text-center py-6 md:py-8">
                     {loadingMore ? (
                       <LoadingSpinner variant="news" text="加载更多新闻..." />
                     ) : (
                       <button
                         onClick={handleLoadMore}
                         disabled={!isOnline}
-                        className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
                       >
                         加载更多新闻
                       </button>
@@ -399,24 +481,24 @@ function App() {
         </div>
       </main>
 
-      {/* 现代化底部 */}
-      <footer className="mt-16 bg-white/60 backdrop-blur-sm border-t border-gray-200/50">
-        <div className="container-modern py-8">
-          <div className="text-center space-y-4">
+      {/* 响应式底部 */}
+      <footer className="mt-12 md:mt-16 bg-white/60 backdrop-blur-sm border-t border-gray-200/50">
+        <div className="container-modern py-6 md:py-8">
+          <div className="text-center space-y-3 md:space-y-4">
             <div className="flex items-center justify-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center">
-                <Newspaper className="w-5 h-5 text-white" />
+              <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center">
+                <Newspaper className="w-4 h-4 md:w-5 md:h-5 text-white" />
               </div>
-              <span className="text-lg font-bold text-gray-900">科技新闻聚合平台</span>
+              <span className="text-base md:text-lg font-bold text-gray-900">科技新闻聚合平台</span>
             </div>
             
-            <div className="text-sm text-gray-600 space-y-1">
+            <div className="text-xs md:text-sm text-gray-600 space-y-1">
               <p>数据来源于各大科技媒体 • 实时更新 • 智能分类</p>
-              <p className="flex items-center justify-center gap-4">
+              <p className="flex flex-wrap items-center justify-center gap-2 md:gap-4">
                 <span>支持全文搜索</span>
-                <span>•</span>
+                <span className="hidden md:inline">•</span>
                 <span>智能分类</span>
-                <span>•</span>
+                <span className="hidden md:inline">•</span>
                 <span>响应式设计</span>
               </p>
             </div>
