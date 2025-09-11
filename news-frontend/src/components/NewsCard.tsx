@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExternalLink, Calendar, Tag } from 'lucide-react';
+import { ExternalLink, Calendar, Tag, Clock, TrendingUp, Star } from 'lucide-react';
 import { TAG_COLORS } from '../types';
 import type { NewsArticle } from '../types';
 
@@ -47,7 +47,25 @@ function getTagClassName(tag: string): string {
 }
 
 /**
- * 新闻卡片组件
+ * 获取评分徽章样式
+ */
+function getScoreBadgeClass(score: number): string {
+  if (score >= 80) return 'badge-score-high';
+  if (score >= 60) return 'badge-score-medium';
+  return 'badge-score-low';
+}
+
+/**
+ * 获取评分图标
+ */
+function getScoreIcon(score: number) {
+  if (score >= 80) return <Star className="w-3 h-3" />;
+  if (score >= 60) return <TrendingUp className="w-3 h-3" />;
+  return <Clock className="w-3 h-3" />;
+}
+
+/**
+ * 现代化新闻卡片组件
  */
 export const NewsCard: React.FC<NewsCardProps> = ({ article, className = '' }) => {
   const handleOpenArticle = () => {
@@ -55,80 +73,100 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, className = '' }) =
   };
 
   return (
-    <article className={`card hover:shadow-md transition-shadow duration-200 cursor-pointer ${className}`}>
-      <div onClick={handleOpenArticle} className="space-y-3">
-        {/* 标题和分数 */}
-        <div className="flex justify-between items-start gap-3">
-          <h2 className="text-lg font-semibold text-gray-900 line-clamp-2 flex-1 hover:text-primary-600 transition-colors">
-            {article.title}
-          </h2>
+    <article className={`group card-elevated hover:shadow-glow-lg transition-all duration-500 cursor-pointer ${className}`}>
+      <div onClick={handleOpenArticle} className="space-y-4">
+        {/* 头部区域 */}
+        <div className="flex justify-between items-start gap-4">
+          <div className="flex-1 min-w-0">
+            <h2 className="text-xl font-bold text-gray-900 line-clamp-2 group-hover:text-gradient transition-all duration-300 leading-tight">
+              {article.title}
+            </h2>
+          </div>
+          
+          {/* 评分徽章 */}
           {article.score > 0 && (
             <div className="flex-shrink-0">
-              <span className={`
-                inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-                ${article.score >= 80 ? 'bg-red-100 text-red-800' :
-                  article.score >= 60 ? 'bg-orange-100 text-orange-800' :
-                  article.score >= 40 ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-green-100 text-green-800'}
-              `}>
-                {article.score}分
-              </span>
+              <div className={`badge ${getScoreBadgeClass(article.score)} flex items-center gap-1`}>
+                {getScoreIcon(article.score)}
+                <span className="font-semibold">{article.score}</span>
+              </div>
             </div>
           )}
         </div>
 
-        {/* 摘要 */}
+        {/* 摘要区域 */}
         {article.summary && (
-          <p className="text-gray-600 text-sm line-clamp-3 leading-relaxed">
-            {article.summary}
-          </p>
-        )}
-
-        {/* 标签 */}
-        {article.tags && article.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            <Tag className="w-3 h-3 text-gray-400 mt-0.5" />
-            {article.tags.slice(0, 4).map((tag, index) => (
-              <span
-                key={index}
-                className={`tag ${getTagClassName(tag)}`}
-              >
-                {tag}
-              </span>
-            ))}
-            {article.tags.length > 4 && (
-              <span className="tag tag-default">
-                +{article.tags.length - 4}
-              </span>
-            )}
+          <div className="relative">
+            <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 group-hover:text-gray-700 transition-colors duration-300">
+              {article.summary}
+            </p>
+            {/* 渐变遮罩效果 */}
+            <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none" />
           </div>
         )}
 
-        {/* 底部信息 */}
-        <div className="flex items-center justify-between text-sm text-gray-500 pt-2 border-t border-gray-100">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1">
-              <Calendar className="w-4 h-4" />
-              <span>{formatPublishTime(article.publishedAt)}</span>
+        {/* 标签区域 */}
+        {article.tags && article.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            <div className="flex items-center gap-2 text-gray-400">
+              <Tag className="w-4 h-4" />
+              <span className="text-xs font-medium">分类</span>
             </div>
+            <div className="flex flex-wrap gap-2">
+              {article.tags.slice(0, 4).map((tag, index) => (
+                <span
+                  key={index}
+                  className={`tag ${getTagClassName(tag)} hover:scale-105 transition-transform duration-200`}
+                >
+                  {tag}
+                </span>
+              ))}
+              {article.tags.length > 4 && (
+                <span className="tag tag-default">
+                  +{article.tags.length - 4}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 底部信息区域 */}
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+          <div className="flex items-center gap-4 text-sm text-gray-500">
+            {/* 发布时间 */}
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-gray-100 rounded-lg">
+                <Calendar className="w-4 h-4 text-gray-600" />
+              </div>
+              <span className="font-medium">{formatPublishTime(article.publishedAt)}</span>
+            </div>
+            
+            {/* 新闻源 */}
             {article.source && (
-              <span className="font-medium text-gray-700">
-                {article.source}
-              </span>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse" />
+                <span className="font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded-lg">
+                  {article.source}
+                </span>
+              </div>
             )}
           </div>
           
+          {/* 阅读按钮 */}
           <button 
-            className="flex items-center gap-1 text-primary-600 hover:text-primary-700 transition-colors"
+            className="btn-ghost group/btn flex items-center gap-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 transition-all duration-200"
             onClick={(e) => {
               e.stopPropagation();
               handleOpenArticle();
             }}
           >
-            <ExternalLink className="w-4 h-4" />
-            <span>阅读原文</span>
+            <span className="text-sm font-semibold">阅读原文</span>
+            <ExternalLink className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform duration-200" />
           </button>
         </div>
+
+        {/* 悬停效果装饰 */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-500/5 to-secondary-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
       </div>
     </article>
   );

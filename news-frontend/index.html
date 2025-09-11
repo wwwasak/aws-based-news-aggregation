@@ -1,13 +1,85 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    
+    <!-- SEO 优化 -->
+    <title>科技新闻聚合 - 实时科技资讯，智能分类推荐</title>
+    <meta name="description" content="专业的科技新闻聚合平台，实时更新AI、科技、政策等最新资讯，支持智能分类和全文搜索，为您提供最及时的科技动态。" />
+    <meta name="keywords" content="科技新闻,AI新闻,科技资讯,新闻聚合,科技政策,科技动态" />
+    <meta name="author" content="科技新闻聚合平台" />
+    
+    <!-- Open Graph 标签 -->
+    <meta property="og:title" content="科技新闻聚合 - 实时科技资讯" />
+    <meta property="og:description" content="专业的科技新闻聚合平台，实时更新最新科技资讯" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://your-domain.com" />
+    <meta property="og:image" content="https://your-domain.com/og-image.jpg" />
+    
+    <!-- Twitter 卡片 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="科技新闻聚合 - 实时科技资讯" />
+    <meta name="twitter:description" content="专业的科技新闻聚合平台，实时更新最新科技资讯" />
+    
+    <!-- 主题色 -->
+    <meta name="theme-color" content="#0ea5e9" />
+    <meta name="msapplication-TileColor" content="#0ea5e9" />
+    
+    <!-- 字体预加载 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- PWA 支持 -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="科技新闻聚合" />
+    
+    <!-- 性能优化 -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+    
+    <!-- 结构化数据 -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "科技新闻聚合",
+      "description": "专业的科技新闻聚合平台，实时更新最新科技资讯",
+      "url": "https://your-domain.com",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://your-domain.com/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- 加载动画 -->
+    <div id="loading-screen" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+      <div class="text-center space-y-4">
+        <div class="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto"></div>
+        <p class="text-gray-600 font-medium">正在加载...</p>
+      </div>
+    </div>
+    
+    <script>
+      // 隐藏加载动画
+      window.addEventListener('load', function() {
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+          loadingScreen.style.opacity = '0';
+          setTimeout(() => {
+            loadingScreen.remove();
+          }, 300);
+        }
+      });
+    </script>
   </body>
 </html>
