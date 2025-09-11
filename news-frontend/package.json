@@ -10,7 +10,11 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "vite preview --port 3000",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "deploy": "npm run build && npm run deploy:vercel",
+    "deploy:vercel": "vercel --prod",
+    "deploy:netlify": "netlify deploy --prod --dir=dist",
+    "deploy:github": "gh-pages -d dist"
   },
   "dependencies": {
     "@types/node": "^24.3.1",
