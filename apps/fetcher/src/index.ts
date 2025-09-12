@@ -97,7 +97,12 @@ export const handler: Handler<EventBridgeEvent<'Scheduled Event', FetcherEvent>>
         let candidates: any[] = [];
         
         if (source.type === 'rss') {
-          candidates = await rssFetcher.fetchCandidates(source);
+          // 传递全局配置中的 maxItemsPerSource 限制
+          const sourceWithLimit = {
+            ...source,
+            maxItems: sources.config.maxItemsPerSource || undefined
+          };
+          candidates = await rssFetcher.fetchCandidates(sourceWithLimit);
         } else if (source.type === 'page') {
           candidates = await webpageFetcher.fetchCandidates(source);
         } else {

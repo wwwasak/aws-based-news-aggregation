@@ -104,6 +104,7 @@ export interface GlobalConfig {
   defaultRetries: number;
   defaultWeight: number;
   defaultInterval: number;
+  maxItemsPerSource?: number;
 }
 
 /**

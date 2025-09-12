@@ -26,7 +26,7 @@ export class RSSFetcher {
   /**
    * 从 RSS 源抓取新闻候选项
    */
-  async fetchCandidates(source: { name: string; url: string }): Promise<NewsCandidate[]> {
+  async fetchCandidates(source: { name: string; url: string; maxItems?: number }): Promise<NewsCandidate[]> {
     try {
       console.log(`📡 Fetching RSS from ${source.name}: ${source.url}`);
 
@@ -40,7 +40,15 @@ export class RSSFetcher {
 
       console.log(`📰 Found ${feed.items.length} items from ${source.name}`);
 
-      for (const item of feed.items) {
+      // 限制处理的文章数量
+      const maxItems = source.maxItems || feed.items.length;
+      const itemsToProcess = feed.items.slice(0, maxItems);
+      
+      if (maxItems < feed.items.length) {
+        console.log(`📊 Limited to processing first ${maxItems} items (out of ${feed.items.length})`);
+      }
+
+      for (const item of itemsToProcess) {
         try {
           const candidate = this.convertItemToCandidate(item, source);
           if (candidate) {
