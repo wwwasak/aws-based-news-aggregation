@@ -52,167 +52,94 @@ topics:
 
 # 规则定义
 rules:
-  # 大科技公司 + AI/政策相关 (高权重)
-  - name: bigtech_ai_policy
-    description: "大科技公司的AI和政策相关新闻"
+  # 大科技公司（出现公司名即加分）
+  - name: bigtech_general
+    description: "涉及大科技公司的任何新闻"
     any:
-      - "$company\\b.*(AI|LLM|model|policy|regulation|antitrust|FTC|DOJ|investigation|lawsuit|monopoly)"
-      - "(AI|LLM|model|policy|regulation|antitrust|FTC|DOJ|investigation|lawsuit|monopoly).*$company\\b"
-    addTags: [bigtech, ai, policy]
-    weight: 5
-
-  # 云基础设施相关
-  - name: cloud_infrastructure
-    description: "云计算和基础设施相关新闻"
-    any:
-      - "$company\\b.*(cloud|datacenter|GPU|TPU|inference|training|server|compute)"
-      - "(cloud|datacenter|GPU|TPU|inference|training|server|compute).*$company\\b"
-    addTags: [bigtech, cloud, infrastructure]
-    weight: 3
-
-  # AI 技术突破
-  - name: ai_breakthrough
-    description: "AI技术突破和产品发布"
-    any:
-      - "\\b(breakthrough|launch|release|announce)\\b.*(AI|LLM|model|ChatGPT|GPT|Copilot)"
-      - "\\b(AI|LLM|model|ChatGPT|GPT|Copilot).*(breakthrough|launch|release|announce)\\b"
-    addTags: [ai, technology, breakthrough]
-    weight: 4
-
-  # 公司收购和投资
-  - name: acquisition_investment
-    description: "收购、投资和合并相关新闻"
-    any:
-      - "$company\\b.*(acquisition|acquire|merger|invest|funding|IPO|valuation)"
-      - "(acquisition|acquire|merger|invest|funding|IPO|valuation).*$company\\b"
-    addTags: [bigtech, business, finance]
-    weight: 4
-
-  # 人事变动 (高管、裁员)
-  - name: personnel_changes
-    description: "高管变动和人事调整"
-    any:
-      - "$company\\b.*(CEO|CTO|CFO|layoffs|hire|fire|resign|appointment)"
-      - "(CEO|CTO|CFO|layoffs|hire|fire|resign|appointment).*$company\\b"
-    addTags: [bigtech, personnel, leadership]
-    weight: 3
-
-  # 监管和法律问题
-  - name: regulatory_legal
-    description: "监管和法律相关问题"
-    any:
-      - "\\b(regulation|regulatory|legal|lawsuit|court|judge|fine|penalty|compliance)\\b"
-      - "\\b(privacy|data protection|GDPR|CCPA|security breach|hack)\\b"
-    addTags: [policy, legal, regulation]
-    weight: 4
-
-  # 财报和业绩
-  - name: earnings_performance
-    description: "财报、业绩和市场表现"
-    any:
-      - "$company\\b.*(earnings|revenue|profit|loss|stock|share|market cap|quarterly)"
-      - "(earnings|revenue|profit|loss|stock|share|market cap|quarterly).*$company\\b"
-    addTags: [bigtech, finance, earnings]
+      - "\\b(?:$company)\\b"
+    addTags: [bigtech]
     weight: 2
 
-  # 产品发布和更新
-  - name: product_launch
-    description: "新产品发布和重大更新"
+  # AI 技术与应用
+  - name: ai_core
+    description: "AI 技术、模型与应用"
     any:
-      - "$company\\b.*(launch|release|unveil|announce|debut|update|version)"
-      - "\\b(iPhone|iPad|MacBook|Surface|Pixel|Galaxy|Windows|iOS|Android)\\b"
-    addTags: [bigtech, product, launch]
-    weight: 2
+      - "\\b(AI|LLM|model|ChatGPT|GPT|Copilot|machine learning|artificial intelligence|inference|training)\\b"
+    addTags: [ai]
+    weight: 3
 
-  # 突发新闻标识符
+  # 政策与监管（含反垄断/隐私/出口管制等）
+  - name: policy_regulation
+    description: "政策与监管，包括反垄断、监管机构与合规"
+    any:
+      - "\\b(policy|regulation|regulatory|law|legal|antitrust|monopoly|competition|compliance)\\b"
+      - "\\b(FTC|DOJ|EU|GDPR|CCPA|data protection|export control|sanction|sanctions)\\b"
+    addTags: [policy]
+    weight: 3
+
+  # 宏观经济（CPI/利率/就业等）
+  - name: macro_economics_simple
+    description: "宏观经济指标与央行政策"
+    any:
+      - "\\b(CPI|PPI|nonfarm|unemployment|employment|GDP|inflation|recession|growth)\\b"
+      - "\\b(Federal Reserve|Fed|central bank|interest rate|hike|cut|QE|QT|monetary policy)\\b"
+    addTags: [economics]
+    weight: 3
+
+  # 政治/选举/国会/法院/制裁
+  - name: politics_events
+    description: "政治事件、选举、立法与重大裁决"
+    any:
+      - "\\b(election|vote|campaign|primary|debate|ballot|impeachment|court|judge|Supreme Court)\\b"
+      - "\\b(congress|senate|house|bill|legislation|appropriation|budget|shutdown)\\b"
+      - "\\b(sanction|sanctions|geopolitical|diplomatic|tariff)\\b"
+    addTags: [politics]
+    weight: 3
+
+  # 突发新闻（高权重）
   - name: breaking_news
     description: "突发新闻标识符"
     any:
       - "^\\s*(BREAKING|URGENT|ALERT|JUST IN|DEVELOPING)"
       - "\\b(breaking|urgent|alert|developing|just in)\\b"
-    addTags: [breaking, urgent]
-    weight: 6
-
-  # 数据泄露和安全事件
-  - name: security_incidents
-    description: "安全事件和数据泄露"
-    any:
-      - "\\b(data breach|hack|cyber attack|security incident|leak|vulnerability)\\b"
-      - "$company\\b.*(breach|hack|attack|leak|vulnerability|security)"
-    addTags: [security, incident, urgent]
+    addTags: [breaking]
     weight: 5
 
-  # 广泛科技相关 (宽松收录)
-  - name: general_tech
-    description: "广泛的科技相关新闻"
+  # 安全事件（泄露/攻击/漏洞）
+  - name: security_incidents
+    description: "安全事件与数据泄露"
     any:
-      - "\\b(technology|tech|digital|software|hardware|internet|web|mobile|app|platform|startup|innovation)\\b"
-      - "\\b(programming|developer|coding|algorithm|database|API|framework|library)\\b"
-      - "\\b(cybersecurity|blockchain|cryptocurrency|fintech|healthtech|edtech|cleantech)\\b"
-      - "\\b(robotics|automation|IoT|5G|6G|VR|AR|metaverse|quantum|semiconductor)\\b"
-    addTags: [technology, general]
-    weight: 2
+      - "\\b(data breach|breach|hack|hacked|ransomware|cyber attack|security incident|leak|vulnerability|CVE)\\b"
+    addTags: [security]
+    weight: 4
 
-  # 宏观经济相关
-  - name: macro_economics
-    description: "宏观经济相关新闻"
+  # 科技/产品发布（宽松，弱权重）
+  - name: tech_product
+    description: "科技产品、发布与通用科技关键词"
     any:
-      - "\\b(economy|economic|GDP|inflation|recession|recovery|growth|market|stock|bond|currency)\\b"
-      - "\\b(Federal Reserve|Fed|central bank|interest rate|monetary policy|fiscal policy)\\b"
-      - "\\b(trade|tariff|export|import|supply chain|manufacturing|employment|unemployment)\\b"
-      - "\\b(energy|oil|gas|renewable|climate|sustainability|ESG|green|carbon)\\b"
-    addTags: [economics, macro, finance]
-    weight: 3
-
-  # 商业和投资
-  - name: business_investment
-    description: "商业、投资和市场相关新闻"
-    any:
-      - "\\b(business|investment|venture|capital|funding|IPO|merger|acquisition|valuation)\\b"
-      - "\\b(earnings|revenue|profit|loss|quarterly|annual|financial|budget)\\b"
-      - "\\b(market cap|shares|dividend|stock price|trading|exchange|nasdaq|NYSE)\\b"
-      - "\\b(startup|unicorn|scale-up|entrepreneur|founder|CEO|CFO|CTO)\\b"
-    addTags: [business, investment, market]
-    weight: 2
-
-  # 政策和监管 (宽松)
-  - name: policy_regulation_broad
-    description: "政策、监管和法律相关新闻"
-    any:
-      - "\\b(policy|regulation|law|legal|government|congress|senate|bill|legislation)\\b"
-      - "\\b(antitrust|monopoly|competition|privacy|data protection|GDPR|compliance)\\b"
-      - "\\b(tax|taxation|subsidy|incentive|grant|public|federal|state)\\b"
-      - "\\b(election|political|vote|campaign|democracy|reform)\\b"
-    addTags: [policy, regulation, government]
-    weight: 2
-
-  # 全球化和国际
-  - name: global_international
-    description: "全球化和国际相关新闻"
-    any:
-      - "\\b(global|international|worldwide|China|Europe|Asia|America|trade war)\\b"
-      - "\\b(geopolitical|diplomatic|sanctions|tariff|export control|supply chain)\\b"
-      - "\\b(emerging market|developing|BRICS|G7|G20|World Bank|IMF)\\b"
-      - "\\b(pandemic|crisis|disaster|climate change|sustainability)\\b"
-    addTags: [global, international, geopolitics]
+      - "\\b(technology|tech|software|hardware|internet|cloud|datacenter|GPU|TPU|semiconductor|chip)\\b"
+      - "\\b(launch|release|unveil|announce|debut|update|version|iPhone|iPad|MacBook|Surface|Pixel|Galaxy|Windows|iOS|Android)\\b"
+    addTags: [technology]
     weight: 2
 
 # 评分阈值配置 (更宽松)
 scoreThresholds:
   # 大科技公司相关文章的最低分数
   bigtech: 3
-  # 政策相关文章的最低分数  
-  policy: 2
   # AI 相关文章的最低分数
   ai: 2
+  # 政策相关文章的最低分数  
+  policy: 2
+  # 经济相关的最低分数
+  economics: 2
+  # 政治相关的最低分数
+  politics: 2
   # 突发新闻的最低分数
   breaking: 4
   # 安全事件的最低分数
   security: 3
   # 科技相关的最低分数
   technology: 2
-  # 经济相关的最低分数
-  economics: 2
 
 # 黑名单关键词 (降低分数或排除)
 blacklist:

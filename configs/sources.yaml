@@ -132,6 +132,139 @@ sources:
       requestsPerMinute: 6
       burstSize: 3
 
+  # —— 增强覆盖的媒体优先源（少量高价值补强） ——
+  - name: Reuters Top News
+    type: rss
+    url: https://www.reuters.com/rssFeed/topNews
+    weight: 3
+    intervalSec: 900   # 15分钟，突发优先
+    enabled: true
+    description: "Global breaking and market-moving headlines"
+    tags: ["breaking", "economics", "politics"]
+    rateLimit:
+      requestsPerMinute: 12
+      burstSize: 6
+
+  - name: Reuters Markets
+    type: rss
+    url: https://www.reuters.com/finance/markets/rss
+    weight: 3
+    intervalSec: 1200
+    enabled: true
+    description: "Markets and macroeconomics coverage"
+    tags: ["economics"]
+    rateLimit:
+      requestsPerMinute: 10
+      burstSize: 5
+
+  - name: Reuters Politics
+    type: rss
+    url: https://www.reuters.com/politics/rss
+    weight: 2
+    intervalSec: 1800
+    enabled: true
+    description: "US and global politics news"
+    tags: ["politics", "policy"]
+    rateLimit:
+      requestsPerMinute: 8
+      burstSize: 4
+
+  - name: AP Top News
+    type: rss
+    url: https://apnews.com/apf-topnews?output=rss
+    weight: 3
+    intervalSec: 900
+    enabled: true
+    description: "Associated Press top and breaking news"
+    tags: ["breaking", "politics", "economics"]
+    rateLimit:
+      requestsPerMinute: 12
+      burstSize: 6
+
+  - name: The Hacker News
+    type: rss
+    url: https://feeds.feedburner.com/TheHackersNews
+    weight: 3
+    intervalSec: 1800
+    enabled: true
+    description: "Cybersecurity news and breaches"
+    tags: ["security"]
+    rateLimit:
+      requestsPerMinute: 8
+      burstSize: 4
+
+  - name: BleepingComputer
+    type: rss
+    url: https://www.bleepingcomputer.com/feed/
+    weight: 2
+    intervalSec: 1800
+    enabled: true
+    description: "Security incidents, ransomware, vulnerabilities"
+    tags: ["security"]
+    rateLimit:
+      requestsPerMinute: 8
+      burstSize: 4
+
+  - name: KrebsOnSecurity
+    type: rss
+    url: https://krebsonsecurity.com/feed/
+    weight: 2
+    intervalSec: 2400
+    enabled: true
+    description: "In-depth security investigations"
+    tags: ["security"]
+    rateLimit:
+      requestsPerMinute: 6
+      burstSize: 3
+
+  - name: OpenAI Blog
+    type: rss
+    url: https://openai.com/blog/rss.xml
+    weight: 2
+    intervalSec: 1800
+    enabled: true
+    description: "Official OpenAI updates"
+    tags: ["ai", "technology"]
+    rateLimit:
+      requestsPerMinute: 6
+      burstSize: 3
+
+  - name: NVIDIA Blog
+    type: rss
+    url: https://blogs.nvidia.com/feed/
+    weight: 2
+    intervalSec: 1800
+    enabled: true
+    description: "NVIDIA AI and data center updates"
+    tags: ["ai", "technology", "bigtech"]
+    rateLimit:
+      requestsPerMinute: 6
+      burstSize: 3
+
+  - name: Apple Newsroom
+    type: rss
+    url: https://www.apple.com/newsroom/rss-feed.rss
+    weight: 2
+    intervalSec: 2400
+    enabled: true
+    description: "Apple official announcements"
+    tags: ["bigtech", "technology"]
+    rateLimit:
+      requestsPerMinute: 6
+      burstSize: 3
+
+  - name: Microsoft Blog
+    type: rss
+    url: https://blogs.microsoft.com/feed/
+    weight: 2
+    intervalSec: 2400
+    enabled: true
+    description: "Microsoft official updates"
+    tags: ["bigtech", "technology", "ai"]
+    rateLimit:
+      requestsPerMinute: 6
+      burstSize: 3
+
 # 错峰调度配置
 scheduling:
   # 启动时的随机延迟范围 (秒)
