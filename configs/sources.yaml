@@ -51,7 +51,7 @@ sources:
     url: https://venturebeat.com/feed/
     weight: 1
     intervalSec: 2400  # 40分钟（免费额度优化）
-    enabled: true
+    enabled: false  # 暂时禁用：返回429错误（速率限制过严）
     description: "Technology news and analysis"
     tags: ["tech", "business", "ai"]
     rateLimit:
@@ -124,10 +124,10 @@ sources:
 
   - name: Reuters Technology
     type: rss
-    url: https://www.reuters.com/technology/feed/
+    url: https://www.reuters.com/technology/rss
     weight: 2
     intervalSec: 1800  # 30分钟
-    enabled: true
+    enabled: false  # 暂时禁用：返回401错误
     description: "Reuters Technology news"
     tags: ["tech", "business", "international"]
     rateLimit:

@@ -52,14 +52,17 @@ export interface QueryParams {
  */
 export const TAG_COLORS: Record<string, string> = {
   ai: 'tag-ai',
-  tech: 'tag-tech',
-  technology: 'tag-tech',
+  bigtech: 'tag-bigtech',
   policy: 'tag-policy',
+  economics: 'tag-economics',
+  politics: 'tag-politics',
+  breaking: 'tag-breaking',
   security: 'tag-security',
-  business: 'tag-business',
-  bigtech: 'tag-tech',
-  breaking: 'tag-security',
-  urgent: 'tag-security',
+  technology: 'tag-tech',
+  // 兼容旧标签
+  tech: 'tag-tech',
+  business: 'tag-economics', // 映射到economics
+  urgent: 'tag-breaking',    // 映射到breaking
   default: 'tag-default',
 };
 
@@ -69,11 +72,13 @@ export const TAG_COLORS: Record<string, string> = {
 export const NEWS_CATEGORIES = [
   { id: 'all', name: '全部', color: 'bg-gray-100 text-gray-800' },
   { id: 'ai', name: 'AI人工智能', color: 'bg-purple-100 text-purple-800' },
-  { id: 'tech', name: '科技', color: 'bg-blue-100 text-blue-800' },
-  { id: 'policy', name: '政策监管', color: 'bg-red-100 text-red-800' },
-  { id: 'security', name: '安全事件', color: 'bg-yellow-100 text-yellow-800' },
-  { id: 'business', name: '商业投资', color: 'bg-green-100 text-green-800' },
   { id: 'bigtech', name: '大科技公司', color: 'bg-indigo-100 text-indigo-800' },
+  { id: 'technology', name: '科技产品', color: 'bg-blue-100 text-blue-800' },
+  { id: 'policy', name: '政策监管', color: 'bg-red-100 text-red-800' },
+  { id: 'economics', name: '宏观经济', color: 'bg-green-100 text-green-800' },
+  { id: 'politics', name: '政治事件', color: 'bg-orange-100 text-orange-800' },
+  { id: 'breaking', name: '突发新闻', color: 'bg-pink-100 text-pink-800' },
+  { id: 'security', name: '安全事件', color: 'bg-yellow-100 text-yellow-800' },
 ] as const;
 
 export type CategoryId = typeof NEWS_CATEGORIES[number]['id'];

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Newspaper, Wifi, WifiOff, Sparkles, TrendingUp, Clock, Menu, X } from 'lucide-react';
+import { Newspaper, Wifi, WifiOff, Sparkles, TrendingUp, Clock, Menu, X, Search } from 'lucide-react';
 import { 
   NewsCard, 
   SearchBar, 
   CategoryFilter, 
+  CategoryBar,
   LoadingSpinner, 
   ErrorMessage 
 } from './components';
@@ -26,6 +27,7 @@ function App() {
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
 
   // 网络状态监听
   useEffect(() => {
@@ -138,7 +140,8 @@ function App() {
     setIsSearchMode(true);
     setSelectedCategory('all');
     setIsMobileMenuOpen(false); // 关闭移动端菜单
-    searchNews(query);
+    setIsSearchVisible(false); // 搜索后隐藏搜索栏
+    searchNews(query); // 调用API搜索
   }, [searchNews]);
 
   /**
@@ -148,7 +151,8 @@ function App() {
     setSearchQuery('');
     setIsSearchMode(false);
     setSelectedCategory('all');
-    loadBigTechNews();
+    setIsSearchVisible(false);
+    loadBigTechNews(); // 重新加载默认新闻
   }, [loadBigTechNews]);
 
   /**
@@ -193,18 +197,28 @@ function App() {
    * 过滤文章（按分类）
    */
   const filteredArticles = React.useMemo(() => {
-    if (selectedCategory === 'all') {
-      return articles;
+    let result = articles;
+    
+    // 搜索模式：直接显示API返回的搜索结果，不进行本地过滤
+    if (isSearchMode) {
+      return result;
     }
     
-    return articles.filter(article => 
-      article.tags.some(tag => 
-        tag.toLowerCase().includes(selectedCategory.toLowerCase()) ||
-        (selectedCategory === 'tech' && (tag.toLowerCase().includes('technology') || tag.toLowerCase().includes('bigtech'))) ||
-        (selectedCategory === 'bigtech' && tag.toLowerCase().includes('tech'))
-      )
-    );
-  }, [articles, selectedCategory]);
+    // 非搜索模式：应用分类过滤
+    if (selectedCategory !== 'all') {
+      result = result.filter(article => 
+        article.tags.some(tag => 
+          tag.toLowerCase().includes(selectedCategory.toLowerCase()) ||
+          // 兼容性映射：technology标签也显示在bigtech分类中
+          (selectedCategory === 'bigtech' && (tag.toLowerCase().includes('tech') || tag.toLowerCase().includes('technology'))) ||
+          // 兼容性映射：tech标签也显示在technology分类中  
+          (selectedCategory === 'technology' && tag.toLowerCase().includes('tech'))
+        )
+      );
+    }
+    
+    return result;
+  }, [articles, selectedCategory, isSearchMode]);
 
   // 初始加载
   useEffect(() => {
@@ -256,6 +270,15 @@ function App() {
                 <TrendingUp className="w-4 h-4" />
                 <span className="text-sm font-medium">实时更新</span>
               </div>
+              
+              {/* 桌面端搜索按钮 */}
+              <button
+                onClick={() => setIsSearchVisible(!isSearchVisible)}
+                className="p-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors"
+                title="搜索新闻"
+              >
+                <Search className="w-5 h-5" />
+              </button>
             </div>
           </div>
 
@@ -274,6 +297,15 @@ function App() {
             
             {/* 移动端菜单按钮和状态 */}
             <div className="flex items-center space-x-2">
+              {/* 搜索按钮 */}
+              <button
+                onClick={() => setIsSearchVisible(!isSearchVisible)}
+                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                title="搜索新闻"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+              
               {/* 网络状态 */}
               <div className={`p-2 rounded-lg ${
                 isOnline ? 'bg-success-50 text-success-700' : 'bg-error-50 text-error-700'
@@ -303,18 +335,24 @@ function App() {
           {isMobileMenuOpen && (
             <div className="md:hidden border-t border-gray-200/50 bg-white/95 backdrop-blur-sm">
               <div className="px-4 py-4 space-y-4">
-                {/* 搜索栏 */}
-                <SearchBar
-                  onSearch={handleSearch}
-                  onClear={handleClearSearch}
-                  isLoading={loading}
-                  placeholder="搜索新闻..."
-                />
-                
                 {/* 分类筛选 */}
                 <CategoryFilter
                   selectedCategory={selectedCategory}
                   onCategoryChange={handleCategoryChange}
+                />
+              </div>
+            </div>
+          )}
+          
+          {/* 条件性搜索栏 - 全屏幕宽度 */}
+          {isSearchVisible && (
+            <div className="border-t border-gray-200/50 bg-white/95 backdrop-blur-sm">
+              <div className="px-4 py-4">
+                <SearchBar
+                  onSearch={handleSearch}
+                  onClear={handleClearSearch}
+                  isLoading={loading}
+                  placeholder="搜索标题、内容、来源或标签..."
                 />
               </div>
             </div>
@@ -325,53 +363,36 @@ function App() {
       {/* 主要内容区域 */}
       <main className="container-modern py-4 md:py-8">
         <div className="space-y-6">
-          {/* 桌面端搜索区域 */}
+          {/* 桌面端标题区域 */}
           <div className="hidden md:block text-center space-y-4">
             <div className="space-y-2">
               <h2 className="text-3xl font-bold text-gray-900">
                 发现最新科技动态
               </h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                智能聚合全球科技新闻，为您提供最及时、最相关的科技资讯
+              智能评分汇总科技新闻，为您提供最及时、最相关的科技资讯
               </p>
-            </div>
-            
-            <div className="max-w-3xl mx-auto">
-              <SearchBar
-                onSearch={handleSearch}
-                onClear={handleClearSearch}
-                isLoading={loading}
-                placeholder="搜索AI、政策、安全等关键词..."
-              />
             </div>
           </div>
 
-          {/* 移动端搜索区域 */}
+          {/* 移动端标题区域 */}
           <div className="md:hidden space-y-4">
             <div className="text-center space-y-2">
               <h2 className="text-xl font-bold text-gray-900">
                 最新科技动态
               </h2>
               <p className="text-sm text-gray-600">
-                智能聚合全球科技新闻
+                智能评分汇总科技新闻
               </p>
             </div>
-            
-            <SearchBar
-              onSearch={handleSearch}
-              onClear={handleClearSearch}
-              isLoading={loading}
-              placeholder="搜索新闻..."
-            />
           </div>
 
-          {/* 桌面端分类筛选 */}
-          <div className="hidden md:block bg-white/60 backdrop-blur-sm rounded-3xl p-6 shadow-soft border border-gray-200/50">
-            <CategoryFilter
-              selectedCategory={selectedCategory}
-              onCategoryChange={handleCategoryChange}
-            />
-          </div>
+          {/* 分类选择栏 - 直观的标签栏设计 */}
+          <CategoryBar
+            selectedCategory={selectedCategory}
+            onCategoryChange={handleCategoryChange}
+            className="sticky top-4 z-10"
+          />
 
           {/* 状态信息区域 */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -387,6 +408,15 @@ function App() {
               <span className="px-2 py-1 bg-primary-100 text-primary-700 rounded-full text-xs font-medium">
                 {filteredArticles.length} 条
               </span>
+              {isSearchMode && (
+                <button
+                  onClick={handleClearSearch}
+                  className="px-2 py-1 text-xs text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  title="清除搜索"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
             </div>
             
             {!isOnline && (
