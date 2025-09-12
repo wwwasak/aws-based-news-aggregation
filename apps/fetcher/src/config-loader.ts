@@ -17,13 +17,14 @@ export class ConfigLoader {
    */
   loadSources(): SourcesConfig {
     try {
-      // 尝试多个可能的配置文件路径
+      // 尝试多个可能的配置文件路径（优先使用主配置文件）
       const possiblePaths = [
+        join(process.cwd(), '../../configs/sources.yaml'), // 项目根目录的主配置文件 (最高优先级)
+        '/opt/configs/sources.yaml', // Lambda层中的配置
         join(this.configPath, 'sources.yaml'),
         join(process.cwd(), 'configs', 'sources.yaml'),
         join(__dirname, '../../configs/sources.yaml'),
         join(__dirname, '../../../configs/sources.yaml'),
-        '/opt/configs/sources.yaml', // Lambda层中的配置
       ];
 
       let config: SourcesConfig | null = null;
@@ -66,13 +67,14 @@ export class ConfigLoader {
    */
   loadKeywords(): KeywordConfig {
     try {
-      // 尝试多个可能的配置文件路径
+      // 尝试多个可能的配置文件路径（优先使用主配置文件）
       const possiblePaths = [
+        join(process.cwd(), '../../configs/keywords.yaml'), // 项目根目录的主配置文件 (最高优先级)
+        '/opt/configs/keywords.yaml', // Lambda层中的配置
         join(this.configPath, 'keywords.yaml'),
         join(process.cwd(), 'configs', 'keywords.yaml'),
         join(__dirname, '../../configs/keywords.yaml'),
         join(__dirname, '../../../configs/keywords.yaml'),
-        '/opt/configs/keywords.yaml', // Lambda层中的配置
       ];
 
       let config: KeywordConfig | null = null;
